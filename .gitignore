@@ -1,0 +1,19 @@
+# Users
+/[Bb]uild/
+/.vs/
+
+# General
+.DS_Store
+
+# Windows shortcuts
+*.lnk
+
+# JetBrains Rider
+.idea/
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

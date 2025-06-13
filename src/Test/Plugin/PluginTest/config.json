@@ -1,0 +1,8 @@
+﻿{
+  "EntryName": "PluginTest",
+  "Description": "测试插件的描述",
+  "Version": "1.0.0",
+  "Author": "PeterXiang",
+  "DisplayName": "测试插件",
+  "GUID": "10DC8888-F9AB-4B69-8530-9B467565A810"
+}
