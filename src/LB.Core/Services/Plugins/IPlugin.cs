@@ -1,5 +1,6 @@
 ﻿using LB.Core.Containers;
 using LB.Core.Services.Logs;
+using System.Threading.Tasks;
 
 namespace LB.Core.Services.Plugins
 {
@@ -9,9 +10,9 @@ namespace LB.Core.Services.Plugins
 
         string folder { get; }
 
-        void OnLoad();
+        Task OnLoad();
 
-        void OnUnload();
+        Task OnUnload();
     }
 
     public interface IPlugin<SettingType> : IPlugin

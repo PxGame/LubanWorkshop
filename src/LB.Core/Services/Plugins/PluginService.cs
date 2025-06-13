@@ -7,6 +7,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -49,6 +50,9 @@ namespace LB.Core.Services.Plugins
         [Inject]
         private IAnalysisService Analysis { get; init; }
 
+        public string AppDataPluginsFolder { get; private set; }
+        public string AppPluginsFolder { get; private set; }
+
         private List<PluginController> controllers = new List<PluginController>();
 
         public PluginService()
@@ -58,6 +62,9 @@ namespace LB.Core.Services.Plugins
         public void OnResolved()
         {
             Log.Information($"OnResolved");
+
+            AppDataPluginsFolder = Path.Combine(Utils.AppDataFolder, "Plugins");
+            AppPluginsFolder = Path.Combine(Utils.AppFolder, "Plugins");
         }
 
         public void OnInstanceReleased()
@@ -68,40 +75,65 @@ namespace LB.Core.Services.Plugins
         public async Task OnServiceInitialize()
         {
             Log.Information($"OnServiceInitialize");
+
+            await LoadAll();
             await Task.CompletedTask;
+        }
+
+        private async Task LoadAll()
+        {
+            await LoadAllFromFolder(AppPluginsFolder);
+            await LoadAllFromFolder(AppDataPluginsFolder);
+        }
+
+        private async Task LoadAllFromFolder(string pluginsFolder)
+        {
+            if (!Directory.Exists(pluginsFolder)) { return; }
+            var folders = Directory.GetDirectories(pluginsFolder);
+            foreach (var folder in folders)
+            {
+                await LoadPluginFromFolder(folder);
+            }
+        }
+
+        private async Task<PluginController> LoadPluginFromFolder(string folder)
+        {
+            return await Load(folder);
         }
 
         public async Task OnServiceShutdown()
         {
             Log.Information($"OnServiceShutdown");
+
+            await UnloadAll();
             await Task.CompletedTask;
         }
 
-        public PluginController Load(string pluginFolder)
+        public async Task<PluginController> Load(string pluginFolder)
         {
             var controller = new PluginController(pluginFolder);
             Container.Inject(controller);
-            controller.Initialize();
+            await controller.Initialize();
+            await controller.Load();
             controllers.Add(controller);
-            controller.Load();
             return controller;
         }
 
-        public bool Unload(PluginController controller)
+        public async Task Unload(PluginController controller)
         {
-            if (controller == null) { return false; }
+            if (controller == null) { return; }
 
             controllers.Remove(controller);
-            controller.Unload();
+            await controller.Unload();
 
-            return true;
+            await Task.CompletedTask;
         }
 
-        public void UnloadAll()
+        public async Task UnloadAll()
         {
             while (controllers.Count > 0)
             {
-                Unload(controllers[0]);
+                await Unload(controllers[0]);
             }
         }
     }

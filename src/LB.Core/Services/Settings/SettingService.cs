@@ -24,8 +24,6 @@ namespace LB.Core.Services.Settings
         [Inject]
         private IContainer Container { get; init; }
 
-        public string MainSettingPath { get; private set; }
-        public string UserSettingPath { get; private set; }
         public string SettingPath { get; private set; }
 
         [CustomSetting("setting")]
@@ -36,9 +34,6 @@ namespace LB.Core.Services.Settings
 
         public void OnResolved()
         {
-            MainSettingPath = Path.Combine(Utils.AppFolder, "setting.json");
-            UserSettingPath = Path.Combine(Utils.AppDataFolder, "setting.json");
-
             Container.RegisterType(typeof(ICustomSetting<>), OnCreateSetting, false, null);
 
             Log.Information($"\nAppFolder : {Utils.AppFolder}\nAppDataFolder : {Utils.AppDataFolder}");

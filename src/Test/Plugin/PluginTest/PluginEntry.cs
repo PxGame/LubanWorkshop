@@ -4,6 +4,7 @@ using LB.Core.Services.Plugins;
 using LB.Plugin;
 using PluginTestDependency;
 using System;
+using System.Threading.Tasks;
 
 namespace PluginTest
 {
@@ -12,14 +13,16 @@ namespace PluginTest
         public string folder { get; set; }
         public IServiceCollection services { get; init; }
 
-        public void OnLoad()
+        public async Task OnLoad()
         {
-            Console.WriteLine($"OnLoad 5 > {new PluginDependency().GetName()}");
+            Console.WriteLine($"OnLoad 5 > {new PluginDependency().GetName()} | {folder}");
+            await Task.CompletedTask;
         }
 
-        public void OnUnload()
+        public async Task OnUnload()
         {
-            Console.WriteLine($"OnUnload 5 > {new PluginDependency().GetName()}");
+            Console.WriteLine($"OnUnload 5 > {new PluginDependency().GetName()} | {folder}");
+            await Task.CompletedTask;
         }
     }
 }

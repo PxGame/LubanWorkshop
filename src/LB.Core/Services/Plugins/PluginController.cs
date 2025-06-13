@@ -1,11 +1,12 @@
 ﻿using LB.Core.Containers;
 using LB.Plugin;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
-using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace LB.Core.Services.Plugins
 {
@@ -35,11 +36,12 @@ namespace LB.Core.Services.Plugins
         {
         }
 
-        public void Initialize()
+        public async Task Initialize()
         {
             var configPath = Path.Combine(_folder, ConfigFileName);
+            if (!File.Exists(configPath)) { throw null; }
             var configJsonStr = File.ReadAllText(configPath);
-            _config = JsonSerializer.Deserialize<PluginConfig>(configJsonStr);
+            _config = JsonConvert.DeserializeObject<PluginConfig>(configJsonStr);
 
             var entryPath = Path.Combine(_folder, $"{_config.EntryName}.dll");
             if (!File.Exists(entryPath)) { throw null; }
@@ -54,6 +56,8 @@ namespace LB.Core.Services.Plugins
 
             _plugin = Activator.CreateInstance(entryType) as IPlugin;
             Container.Inject(_plugin);
+
+            await Task.CompletedTask;
         }
 
         private Assembly OnContextResolver(AssemblyLoadContext context, AssemblyName name)
@@ -70,14 +74,14 @@ namespace LB.Core.Services.Plugins
             return null;
         }
 
-        public void Load()
+        public async Task Load()
         {
-            _plugin.OnLoad();
+            await _plugin.OnLoad();
         }
 
-        public void Unload()
+        public async Task Unload()
         {
-            _plugin.OnUnload();
+            await _plugin.OnUnload();
             _plugin = null;
 
             var contextWeak = new WeakReference(_context);
@@ -89,6 +93,8 @@ namespace LB.Core.Services.Plugins
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
+
+            await Task.CompletedTask;
         }
     }
 }
