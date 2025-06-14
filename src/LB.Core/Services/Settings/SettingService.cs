@@ -34,19 +34,33 @@ namespace LB.Core.Services.Settings
 
         public void OnResolved()
         {
-            Container.RegisterType(typeof(ICustomSetting<>), OnCreateSetting, false, null);
+            Container.RegisterType(typeof(ICustomSetting<>), OnCreateSetting, false, null, false);
 
             Log.Information($"\nAppFolder : {Utils.AppFolder}\nAppDataFolder : {Utils.AppDataFolder}");
         }
 
-        private object OnCreateSetting(IRegistration regist, Type type, object[] extraInfos, object[] args)
+        private object OnCreateSetting(IRegistration regist, Type type, List<object> extraInfos, object[] args)
         {
             CustomSettingAttribute settingInfo = extraInfos.FirstOrDefault(x => x is CustomSettingAttribute) as CustomSettingAttribute;
 
             if (settingInfo != null && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ICustomSetting<>))
             {
+                var settingPath = settingInfo.RelativePath;
+                if (!string.IsNullOrEmpty(settingInfo.GetFirstSubPathMethodName))
+                {
+                    var injectTarget = extraInfos.FirstOrDefault(x => x is InjectTarget) as InjectTarget;
+                    if (injectTarget == null || injectTarget.Target == null) { throw new ContainerException("InjectTarget 未找到或 Target 为空"); }
+                    var getFirstSubPathMethod = injectTarget.Target.GetType().GetMethod(settingInfo.GetFirstSubPathMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (getFirstSubPathMethod == null) { throw new ContainerException($"未找到方法 {settingInfo.GetFirstSubPathMethodName}"); }
+                    var firstSubPath = getFirstSubPathMethod.Invoke(injectTarget.Target, null) as string;
+                    if (!string.IsNullOrEmpty(firstSubPath))
+                    {
+                        settingPath = Path.Combine(firstSubPath, settingPath).StandardizedPath();
+                    }
+                }
+
                 var settingType = type.GetGenericArguments()[0];
-                var settingInstance = Activator.CreateInstance(typeof(CustomSetting<>).MakeGenericType(settingType), settingInfo.RelativePath, settingInfo.IsAppFolder);
+                var settingInstance = Activator.CreateInstance(typeof(CustomSetting<>).MakeGenericType(settingType), settingPath, settingInfo.IsAppFolder);
                 return settingInstance;
             }
 

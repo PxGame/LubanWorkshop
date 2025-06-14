@@ -1,5 +1,6 @@
 ﻿using LB.Core.Services.Logs;
 using Serilog;
+using System;
 
 namespace LB.Core.Services.Plugins
 {

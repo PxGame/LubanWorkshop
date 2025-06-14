@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace LB.Core.Containers
 {
-    public delegate object OnConstructObject(IRegistration regist, Type type, object[] extraInfos, object[] args);
+    public delegate object OnConstructObject(IRegistration regist, Type type, List<object> extraInfos, object[] args);
 
     public interface IRegistration
     {

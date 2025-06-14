@@ -81,7 +81,7 @@ namespace LB.Core.Services.Logs
             _logger.Fatal(exception, messageTemplate);
         }
 
-        public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+        public virtual void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
             string tag = _tag ?? typeof(T).Name;
             var property = propertyFactory.CreateProperty("LogTag", tag, true);

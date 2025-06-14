@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace LB.Core.Containers
@@ -19,14 +20,14 @@ namespace LB.Core.Containers
 
         IRegistration RegisterType<T>();
 
-        IRegistration RegisterType(Type type, OnConstructObject construct, bool isInstance, Type asType);
+        IRegistration RegisterType(Type type, OnConstructObject construct, bool isInstance, Type asType, bool supportAssignableType);
 
         IRegistration RegisterType<T>(OnConstructObject construct);
 
-        object Resolve(Type type, object[] extraInfos, object[] args);
+        object Resolve(Type type, List<object> extraInfos, object[] args);
 
-        T Resolve<T>(object[] extraInfos, object[] args) where T : class;
+        T Resolve<T>(List<object> extraInfos, object[] args) where T : class;
 
-        T Resolve<T>(object[] extraInfos) where T : class;
+        T Resolve<T>(List<object> extraInfos) where T : class;
     }
 }

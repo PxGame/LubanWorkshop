@@ -51,14 +51,14 @@ namespace LB.Core.Services.Logs
                 .Enrich.FromLogContext()
                 .CreateLogger();
 
-            Container.RegisterType(typeof(ILog<>), OnCreateLog, false, typeof(ILog));
+            Container.RegisterType(typeof(ILog<>), OnCreateLog, false, typeof(ILog), false);
 
             Log = Container.Resolve<ILog>([new LogInfoAttribute() { Tag = "日志服务" }]);
 
             Log.Information($"OnResolved");
         }
 
-        private object OnCreateLog(IRegistration regist, Type type, object[] extraInfos, object[] args)
+        private object OnCreateLog(IRegistration regist, Type type, List<object> extraInfos, object[] args)
         {
             LogInfoAttribute logInfo = extraInfos?.FirstOrDefault(x => x is LogInfoAttribute) as LogInfoAttribute;
 

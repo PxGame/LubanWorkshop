@@ -8,7 +8,7 @@ namespace LB.Core.Services.Plugins
 
     internal class PluginCustomSetting<T> : CustomSetting<T>, IPluginCustomSetting<T>
     {
-        public PluginCustomSetting(string relativePath) : base(relativePath, false)
+        public PluginCustomSetting(string relativePath, bool isAppFolder) : base(relativePath, isAppFolder)
         {
         }
     }

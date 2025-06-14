@@ -63,15 +63,12 @@ namespace LB.Core.Services.Plugins
         private Assembly OnContextResolver(AssemblyLoadContext context, AssemblyName name)
         {
             var path = Path.Combine(_folder, $"{name.Name}.dll");
-            if (File.Exists(path))
-            {
-                using (var assemblyStream = File.OpenRead(path))
-                {
-                    return context.LoadFromStream(assemblyStream);
-                }
-            }
+            if (!File.Exists(path)) { return null; }
 
-            return null;
+            using (var assemblyStream = File.OpenRead(path))
+            {
+                return context.LoadFromStream(assemblyStream);
+            }
         }
 
         public async Task Load()

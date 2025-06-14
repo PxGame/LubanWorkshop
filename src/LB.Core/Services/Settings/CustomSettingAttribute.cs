@@ -12,6 +12,8 @@ namespace LB.Core.Services.Settings
 
         public bool IsAppFolder { get; set; }
 
+        public string GetFirstSubPathMethodName { get; set; }
+
         public string RelativePath => string.IsNullOrEmpty(SubPath) ? Name : Path.Combine(SubPath, Name).StandardizedPath();
 
         public CustomSettingAttribute(string name)

@@ -12,6 +12,7 @@ namespace PluginTest
     {
         public string folder { get; set; }
         public IServiceCollection services { get; init; }
+        public IPluginConfig config { get; init; }
 
         public async Task OnLoad()
         {

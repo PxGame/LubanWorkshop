@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace LB.Core.Services.Plugins
 {
-    public class PluginService : IPluginService, IOnResolved
+    internal class PluginService : IPluginService, IOnResolved
     {
         [Inject]
         private IContainer Container { get; init; }
@@ -42,6 +42,9 @@ namespace LB.Core.Services.Plugins
 
             AppDataPluginsFolder = Path.Combine(Utils.AppDataFolder, "Plugins");
             AppPluginsFolder = Path.Combine(Utils.AppFolder, "Plugins");
+
+            Container.RegisterType<PluginController>();
+            //Container.RegisterType<IPlugin>
         }
 
         public void OnInstanceReleased()
@@ -88,8 +91,7 @@ namespace LB.Core.Services.Plugins
 
         public async Task<PluginController> Load(string pluginFolder)
         {
-            var controller = new PluginController(pluginFolder);
-            Container.Inject(controller);
+            var controller = Container.Resolve<PluginController>(null, [pluginFolder]);
             await controller.Initialize();
             await controller.Load();
             controllers.Add(controller);
@@ -98,9 +100,8 @@ namespace LB.Core.Services.Plugins
 
         public async Task Unload(PluginController controller)
         {
-            if (controller == null) { return; }
-
             controllers.Remove(controller);
+            if (controller == null) { return; }
             await controller.Unload();
 
             await Task.CompletedTask;

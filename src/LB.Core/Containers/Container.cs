@@ -63,10 +63,10 @@ namespace LB.Core.Containers
         public Container()
         {
             //注册当前实例
-            RegisterType(typeof(Container), (_, _, _, _) => this, true, typeof(IContainer));
+            RegisterType(typeof(Container), (_, _, _, _) => this, true, typeof(IContainer), false);
         }
 
-        public IRegistration RegisterType(Type type, OnConstructObject construct, bool isInstance, Type asType)
+        public IRegistration RegisterType(Type type, OnConstructObject construct, bool isInstance, Type asType, bool supportAssignableType)
         {
             if (type == null) { throw new ContainerException("类型不能为空"); }
             if (IsRegistered(type)) { throw new ContainerException($"类型已经被注册：{type} "); }
@@ -78,6 +78,7 @@ namespace LB.Core.Containers
                 Construct = construct,
                 IsInstance = isInstance,
                 AsType = asType,
+                supportAssignableType = supportAssignableType,
             };
             Registrations.Add(target);
 
@@ -108,7 +109,7 @@ namespace LB.Core.Containers
             return GetRegistration(type) != null;
         }
 
-        internal object Resolve(Registration regist, Type targetType, object[] extraInfos, object[] args)
+        internal object Resolve(Registration regist, Type targetType, List<object> extraInfos, object[] args)
         {
             if (regist == null) { throw new ContainerException($"regist参数不能为空"); }
             if (regist.IsResolving) { throw new ContainerException($"循环依赖: {regist.Type}"); }
@@ -155,7 +156,7 @@ namespace LB.Core.Containers
             ReleaseInstance(regist);
         }
 
-        public object Resolve(Type type, object[] extraInfos, object[] args)
+        public object Resolve(Type type, List<object> extraInfos, object[] args)
         {
             if (type == null) { throw new ContainerException("类型不能为空"); }
             var regist = GetRegistration(type);
@@ -176,16 +177,35 @@ namespace LB.Core.Containers
                 if (inject == null) { continue; }
                 if (prop.GetValue(instance) != null) { continue; }
 
-                var attrs = prop.GetCustomAttributes(true);
+                var extraInfos = prop.GetCustomAttributes(true).ToList();
+                extraInfos.Add(new InjectTarget() { Target = instance });
 
                 if (inject.fromType != null && !prop.PropertyType.IsAssignableFrom(inject.fromType)) { throw new ContainerException($"属性 {prop.Name} 的类型 {prop.PropertyType} 无法转换为注入类型 {inject.fromType}"); }
 
                 var propType = inject.fromType ?? prop.PropertyType;
-                var propValue = Resolve(propType, attrs, []);
+                var propValue = Resolve(propType, extraInfos, []);
                 prop.SetValue(instance, propValue);
             }
 
             return instance;
+        }
+
+        private bool CheckRegistType(Type type, Type registType, bool supportAssignableType)
+        {
+            if (type == null || registType == null) { return false; }
+            if (type == registType) { return true; }
+            if (supportAssignableType && registType.IsAssignableFrom(type)) { return true; }
+
+            if (type.IsGenericType)
+            {
+                var gType = type.GetGenericTypeDefinition();
+                if (registType.IsGenericTypeDefinition && registType == gType)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private Registration GetRegistration(Type type)
@@ -193,19 +213,10 @@ namespace LB.Core.Containers
             if (type == null) { throw new ContainerException("类型不能为空"); }
             foreach (var regist in Registrations)
             {
-                if (regist.Type == type || regist.AsType == type) { return regist; }
-
-                if (type.IsGenericType)
+                if (CheckRegistType(type, regist.Type, regist.supportAssignableType)
+                    || CheckRegistType(type, regist.AsType, regist.supportAssignableType))
                 {
-                    var gType = type.GetGenericTypeDefinition();
-                    if (regist.Type.IsGenericTypeDefinition && regist.Type == gType)
-                    {
-                        return regist;
-                    }
-                    else if (regist.AsType != null && regist.AsType.IsGenericTypeDefinition && regist.AsType == gType)
-                    {
-                        return regist;
-                    }
+                    return regist;
                 }
             }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LB.Core.Containers
 {
@@ -6,12 +7,12 @@ namespace LB.Core.Containers
     {
         #region Resovle
 
-        public T Resolve<T>(object[] extraInfos) where T : class
+        public T Resolve<T>(List<object> extraInfos) where T : class
         {
             return Resolve(typeof(T), extraInfos, []) as T;
         }
 
-        public T Resolve<T>(object[] extraInfos, object[] args) where T : class
+        public T Resolve<T>(List<object> extraInfos, object[] args) where T : class
         {
             return Resolve(typeof(T), extraInfos, args) as T;
         }
@@ -22,12 +23,12 @@ namespace LB.Core.Containers
 
         public IRegistration RegisterType<T>()
         {
-            return RegisterType(typeof(T), null, false, null);
+            return RegisterType(typeof(T), null, false, null, false);
         }
 
         public IRegistration RegisterType<T>(OnConstructObject construct)
         {
-            return RegisterType(typeof(T), construct != null ? (r, t, p, args) => construct(r, t, p, args) : null, false, null);
+            return RegisterType(typeof(T), construct != null ? (r, t, p, args) => construct(r, t, p, args) : null, false, null, false);
         }
 
         #endregion Not Instance
@@ -41,7 +42,7 @@ namespace LB.Core.Containers
 
         public IRegistration RegisterInstance<T, AsT>(OnConstructObject construct)
         {
-            return RegisterType(typeof(T), construct != null ? (r, t, p, args) => construct(r, t, p, args) : null, true, typeof(AsT));
+            return RegisterType(typeof(T), construct != null ? (r, t, p, args) => construct(r, t, p, args) : null, true, typeof(AsT), false);
         }
 
         public IRegistration RegisterInstance<T>()
@@ -51,7 +52,7 @@ namespace LB.Core.Containers
 
         public IRegistration RegisterInstance<T>(OnConstructObject construct)
         {
-            return RegisterType(typeof(T), construct != null ? (r, t, p, args) => construct(r, t, p, args) : null, true, null);
+            return RegisterType(typeof(T), construct != null ? (r, t, p, args) => construct(r, t, p, args) : null, true, null, false);
         }
 
         #endregion Instance

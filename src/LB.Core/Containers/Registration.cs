@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using static LB.Core.Containers.IRegistration;
 
@@ -30,6 +31,7 @@ namespace LB.Core.Containers
         public OnConstructObject Construct { get; init; }
         public bool IsInstance { get; init; }
         public Type AsType { get; init; }
+        public bool supportAssignableType { get; init; }
 
         public object Instance { get; set; }
         public bool IsResolving { get; private set; }
@@ -41,7 +43,7 @@ namespace LB.Core.Containers
 
         public ResolvingScope NewResolvingScope() => new ResolvingScope(this);
 
-        public object ConstructObject(Type target, object[] extraInfos, object[] args)
+        public object ConstructObject(Type target, List<object> extraInfos, object[] args)
         {
             if (Construct == null) { return Activator.CreateInstance(Type, args); }
             var result = Construct(this, target, extraInfos, args);
