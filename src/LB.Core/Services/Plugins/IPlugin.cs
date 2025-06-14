@@ -5,25 +5,24 @@ using System.Threading.Tasks;
 
 namespace LB.Core.Services.Plugins
 {
-    public interface IPlugin
+    public abstract class IPlugin
     {
-        [Inject] IServiceCollection services { get; init; }
+        [Inject] public IServiceCollection services { get; init; }
+        [Inject] public string RootFolder { get; init; }
+        [Inject] public IPluginConfig Config { get; init; }
 
-        string folder { get; }
-        IPluginConfig config { get; }
+        public abstract Task OnLoad();
 
-        Task OnLoad();
-
-        Task OnUnload();
+        public abstract Task OnUnload();
     }
 
-    public interface IPlugin<SettingType, PluginType> : IPlugin
+    public abstract class IPlugin<SettingType, PluginType> : IPlugin
     {
         [Inject]
         [CustomSetting("setting.json", SubPath = "")]
-        IPluginCustomSetting<SettingType> UserSetting { get; init; }
+        public IPluginCustomSetting<SettingType> UserSetting { get; init; }
 
         [Inject]
-        IPluginLog<PluginType> Log { get; init; }
+        public IPluginLog<PluginType> Log { get; init; }
     }
 }

@@ -109,7 +109,7 @@ namespace LB.Core.Containers
             return GetRegistration(type) != null;
         }
 
-        internal object Resolve(Registration regist, Type targetType, List<object> extraInfos, object[] args)
+        internal object Resolve(Registration regist, Type targetType, List<object> extraInfos, object[] args, InjectExtraPropertyValue extraPropertyValue)
         {
             if (regist == null) { throw new ContainerException($"regist参数不能为空"); }
             if (regist.IsResolving) { throw new ContainerException($"循环依赖: {regist.Type}"); }
@@ -122,7 +122,7 @@ namespace LB.Core.Containers
                     if (regist.IsInstance && regist.Instance != null) { return regist.Instance; }
 
                     result = regist.ConstructObject(targetType, extraInfos ?? [], args ?? []);
-                    Inject(result);
+                    Inject(result, extraPropertyValue);
 
                     if (regist.IsInstance) { regist.Instance = result; }
                 }
@@ -156,15 +156,15 @@ namespace LB.Core.Containers
             ReleaseInstance(regist);
         }
 
-        public object Resolve(Type type, List<object> extraInfos, object[] args)
+        public object Resolve(Type type, List<object> extraInfos, object[] args, InjectExtraPropertyValue extraPropertyValue)
         {
             if (type == null) { throw new ContainerException("类型不能为空"); }
             var regist = GetRegistration(type);
             if (regist == null) { throw new ContainerException($"未注册类型: {type}"); }
-            return Resolve(regist, type, extraInfos, args);
+            return Resolve(regist, type, extraInfos, args, extraPropertyValue);
         }
 
-        public object Inject(object instance)
+        public object Inject(object instance, InjectExtraPropertyValue extraPropertyValue)
         {
             if (instance == null) { throw new ContainerException("实例不能为空"); }
             var type = instance.GetType();
@@ -177,13 +177,19 @@ namespace LB.Core.Containers
                 if (inject == null) { continue; }
                 if (prop.GetValue(instance) != null) { continue; }
 
-                var extraInfos = prop.GetCustomAttributes(true).ToList();
-                extraInfos.Add(new InjectTarget() { Target = instance });
+                if (extraPropertyValue != null && extraPropertyValue.TryGetValue(prop.Name, out object extraValue) && extraValue != null)
+                {
+                    var extraValueType = extraValue.GetType();
+                    if (prop.PropertyType != extraValueType && !prop.PropertyType.IsAssignableFrom(extraValueType)) { throw new ContainerException($"属性 {prop.Name} 的类型 {prop.PropertyType} 无法转换为额外注入值的类型 {extraValue.GetType()}"); }
+                    prop.SetValue(instance, extraValue);
+                    continue;
+                }
 
                 if (inject.fromType != null && !prop.PropertyType.IsAssignableFrom(inject.fromType)) { throw new ContainerException($"属性 {prop.Name} 的类型 {prop.PropertyType} 无法转换为注入类型 {inject.fromType}"); }
-
                 var propType = inject.fromType ?? prop.PropertyType;
-                var propValue = Resolve(propType, extraInfos, []);
+                var extraInfos = prop.GetCustomAttributes(true).ToList();
+                extraInfos.Add(new InjectTarget() { Target = instance });
+                var propValue = Resolve(propType, extraInfos, [], null);
                 prop.SetValue(instance, propValue);
             }
 

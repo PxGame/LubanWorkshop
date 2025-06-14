@@ -10,19 +10,15 @@ namespace PluginTest
 {
     public class PluginEntry : IPlugin
     {
-        public string folder { get; set; }
-        public IServiceCollection services { get; init; }
-        public IPluginConfig config { get; init; }
-
-        public async Task OnLoad()
+        public override async Task OnLoad()
         {
-            Console.WriteLine($"OnLoad 5 > {new PluginDependency().GetName()} | {folder}");
+            Console.WriteLine($"OnLoad 5 > {new PluginDependency().GetName()} | {RootFolder}");
             await Task.CompletedTask;
         }
 
-        public async Task OnUnload()
+        public override async Task OnUnload()
         {
-            Console.WriteLine($"OnUnload 5 > {new PluginDependency().GetName()} | {folder}");
+            Console.WriteLine($"OnUnload 5 > {new PluginDependency().GetName()} | {RootFolder}");
             await Task.CompletedTask;
         }
     }

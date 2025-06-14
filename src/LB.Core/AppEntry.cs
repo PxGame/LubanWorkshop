@@ -53,11 +53,11 @@ namespace LB.Core
 
             foreach (var serviceType in Services.GetServiceTypes())
             {
-                Container.Resolve(serviceType, [], []);
+                Container.Resolve(serviceType, [], [], null);
             }
             Container.RegisterInstance<IServiceCollection>((_, _, _, _) => Services);
 
-            Container.Inject(this);
+            Container.Inject(this, null);
             Log.Information($"Initialize start ...");
             foreach (var service in Services)
             {

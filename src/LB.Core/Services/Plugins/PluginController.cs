@@ -54,8 +54,11 @@ namespace LB.Core.Services.Plugins
             var entryType = entryAssembly.GetTypes().FirstOrDefault(t => t.IsClass && typeof(IPlugin).IsAssignableFrom(t), null);
             if (entryType == null) { throw null; }
 
-            _plugin = Activator.CreateInstance(entryType) as IPlugin;
-            Container.Inject(_plugin);
+            _plugin = Container.Resolve(entryType, [], [],
+                new InjectExtraPropertyValue() {
+                    { "RootFolder", _folder},
+                    { "Config", _config},
+                }) as IPlugin;
 
             await Task.CompletedTask;
         }

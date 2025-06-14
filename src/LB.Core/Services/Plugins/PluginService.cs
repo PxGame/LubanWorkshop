@@ -44,7 +44,12 @@ namespace LB.Core.Services.Plugins
             AppPluginsFolder = Path.Combine(Utils.AppFolder, "Plugins");
 
             Container.RegisterType<PluginController>();
-            //Container.RegisterType<IPlugin>
+            Container.RegisterType(typeof(IPlugin), OnCreatePlugin, false, null, true);
+        }
+
+        private object OnCreatePlugin(IRegistration regist, Type type, List<object> extraInfos, object[] args)
+        {
+            return Activator.CreateInstance(type);
         }
 
         public void OnInstanceReleased()

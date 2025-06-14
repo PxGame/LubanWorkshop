@@ -6,7 +6,7 @@ namespace LB.Core.Containers
 {
     public interface IContainer : IDisposable
     {
-        object Inject(object instance);
+        object Inject(object instance, InjectExtraPropertyValue extraPropertyValue);
 
         bool IsRegistered(Type type);
 
@@ -24,7 +24,7 @@ namespace LB.Core.Containers
 
         IRegistration RegisterType<T>(OnConstructObject construct);
 
-        object Resolve(Type type, List<object> extraInfos, object[] args);
+        object Resolve(Type type, List<object> extraInfos, object[] args, InjectExtraPropertyValue extraPropertyValue);
 
         T Resolve<T>(List<object> extraInfos, object[] args) where T : class;
 

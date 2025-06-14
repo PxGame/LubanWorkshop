@@ -6,12 +6,12 @@ while (true)
 {
     Console.WriteLine("Hello, World!");
     {
-        var manager = new PluginService();
+        //var manager = new PluginService();
 
-        manager.Load("..\\..\\PluginTest\\debug\\");
+        //manager.Load("..\\..\\PluginTest\\debug\\");
 
-        manager.UnloadAll();
-        manager = null;
+        //manager.UnloadAll();
+        //manager = null;
     }
     Console.WriteLine("Completed!");
     Console.WriteLine("Press any key to continue...");

@@ -9,12 +9,12 @@ namespace LB.Core.Containers
 
         public T Resolve<T>(List<object> extraInfos) where T : class
         {
-            return Resolve(typeof(T), extraInfos, []) as T;
+            return Resolve(typeof(T), extraInfos, [], null) as T;
         }
 
         public T Resolve<T>(List<object> extraInfos, object[] args) where T : class
         {
-            return Resolve(typeof(T), extraInfos, args) as T;
+            return Resolve(typeof(T), extraInfos, args, null) as T;
         }
 
         #endregion Resovle
