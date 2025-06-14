@@ -8,22 +8,28 @@ using System.Threading.Tasks;
 
 namespace PluginTest
 {
-    public class PluginEntry : IPlugin
+    public class PluginUserSetting
+    {
+        public string Name { get; set; } = "PluginTest";
+    }
+
+    public class PluginEntry : IPlugin<PluginUserSetting>
     {
         public override void OnResolved()
         {
-            Console.WriteLine($"OnResolved 5 > {RootFolder} | {this.Config.Name}");
+            Log.Information($"OnResolved 5 > {RootFolder} | {this.Config.Name}");
         }
 
         public override async Task OnLoad()
         {
-            Console.WriteLine($"OnLoad 5 > {new PluginDependency().GetName()} | {RootFolder}");
+            Log.Information($"OnLoad 5 > {new PluginDependency().GetName()} | {RootFolder}");
             await Task.CompletedTask;
         }
 
         public override async Task OnUnload()
         {
-            Console.WriteLine($"OnUnload 5 > {new PluginDependency().GetName()} | {RootFolder}");
+            await base.OnUnload();
+            Log.Information($"OnUnload 5 > {new PluginDependency().GetName()} | {RootFolder}");
             await Task.CompletedTask;
         }
     }
