@@ -12,7 +12,7 @@ namespace LB.Core.Services.Plugins
 {
     public class PluginController : IOnResolved
     {
-        public const string ConfigFileName = "config.json";
+        public const string ConfigFileName = "plugin.json";
 
         [Inject]
         private IContainer Container { get; init; }
@@ -46,7 +46,7 @@ namespace LB.Core.Services.Plugins
             var entryPath = Path.Combine(_folder, $"{_config.EntryName}.dll");
             if (!File.Exists(entryPath)) { throw null; }
 
-            _context = new AssemblyLoadContext(_config.GUID, true);
+            _context = new AssemblyLoadContext(_config.Name, true);
             _context.Resolving += OnContextResolver;
             using var entryStream = File.OpenRead(entryPath);
             var entryAssembly = _context.LoadFromStream(entryStream);

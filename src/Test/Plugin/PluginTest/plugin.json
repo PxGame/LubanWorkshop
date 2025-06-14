@@ -1,0 +1,22 @@
+﻿{
+  "Name": "com.test.plugintest",
+  "Version": "1.0.0",
+  "Description": "This is a test plugin for the PluginTest project.",
+  "DisplayName": "测试用插件",
+  "DocumentationUrl": "https://docs.unity.cn/Manual/upm-manifestPkg.html",
+  "LicenesesUrl": "https://developer.unity.cn/",
+  "Dependencies": {
+    "com.test.plugintest1": "1.0.1",
+    "com.test.plugintest2": "1.0.2",
+    "com.test.plugintest3": "1.0.3"
+  },
+  "Keywords": [
+    "test",
+    "plugin",
+    "unity"
+  ],
+  "EntryName": "PluginTest",
+  "AuthorName": "Test Author",
+  "AuthorEmail": "565067150@qq.com",
+  "AuthorUrl": "https://docs.unity.cn/Manual/upm-manifestPkg.html"
+}

@@ -43,7 +43,7 @@ namespace LB.Core.Services.Settings
         {
             CustomSettingAttribute settingInfo = extraInfos.FirstOrDefault(x => x is CustomSettingAttribute) as CustomSettingAttribute;
 
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ICustomSetting<>))
+            if (settingInfo != null && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ICustomSetting<>))
             {
                 var settingType = type.GetGenericArguments()[0];
                 var settingInstance = Activator.CreateInstance(typeof(CustomSetting<>).MakeGenericType(settingType), settingInfo.RelativePath, settingInfo.IsAppFolder);

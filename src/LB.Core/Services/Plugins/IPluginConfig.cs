@@ -1,12 +1,21 @@
-﻿namespace LB.Core.Services.Plugins
+﻿using System;
+using System.Collections.Generic;
+
+namespace LB.Core.Services.Plugins
 {
     public interface IPluginConfig
     {
-        string Author { get; set; }
-        string Description { get; set; }
-        string DisplayName { get; set; }
-        string EntryName { get; set; }
-        string GUID { get; set; }
-        string Version { get; set; }
+        string Name { get; }
+        string Version { get; }
+        string Description { get; }
+        string DisplayName { get; }
+        Uri DocumentationUrl { get; }
+        Uri LicenesesUrl { get; }
+        Dictionary<string, Version> Dependencies { get; }
+        string[] Keywords { get; }
+        string EntryName { get; }
+        string AuthorName { get; }
+        string AuthorEmail { get; }
+        Uri AuthorUrl { get; }
     }
 }

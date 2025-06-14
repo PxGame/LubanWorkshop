@@ -3,7 +3,6 @@ using LB.Core.Services.Analyses;
 using LB.Core.Services.Logs;
 using LB.Core.Services.Settings;
 using LB.Plugin;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,28 +12,6 @@ using System.Threading.Tasks;
 
 namespace LB.Core.Services.Plugins
 {
-    public interface IPluginCustomSetting<T> : ICustomSetting<T>
-    {
-    }
-
-    internal class PluginCustomSetting<T> : CustomSetting<T>, IPluginCustomSetting<T>
-    {
-        public PluginCustomSetting(string relativePath) : base(relativePath, false)
-        {
-        }
-    }
-
-    public interface IPluginLog<T> : ILog<T>
-    {
-    }
-
-    internal class PluginLog<T> : Log<T>, IPluginLog<T>
-    {
-        public PluginLog(ILogger rootLogger, string tag) : base(rootLogger, tag)
-        {
-        }
-    }
-
     public class PluginService : IPluginService, IOnResolved
     {
         [Inject]
