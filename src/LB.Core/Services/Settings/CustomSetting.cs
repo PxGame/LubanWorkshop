@@ -3,26 +3,17 @@ using System;
 
 namespace LB.Core.Services.Settings
 {
-    public interface ICustomSetting<T> : IOnResolved
-    {
-        T Data { get; }
-
-        void Reload();
-
-        void Save();
-    }
-
-    internal class CustomSetting<T> : ICustomSetting<T>
+    public class CustomSetting<T> : ICustomSetting<T>
     {
         [Inject]
         public ISettingService Setting { get; init; }
 
+        public bool IsAppFolder { get; init; }
+        public string RelativeFilePath { get; init; }
+
         public Action OnReload { get; set; }
         public Action OnSaved { get; set; }
         public T Data { get; private set; }
-
-        public string RelativeFilePath { get; }
-        public bool IsAppFolder { get; }
 
         public CustomSetting(string relativePath, bool isAppFolder)
         {
@@ -30,21 +21,23 @@ namespace LB.Core.Services.Settings
             IsAppFolder = isAppFolder;
         }
 
-        public void Reload()
+        public virtual SaveScope NewSaveScope() => new SaveScope(this);
+
+        public virtual void OnResolved()
+        {
+            Reload();
+        }
+
+        public virtual void Reload()
         {
             Data = Setting.Load<T>(RelativeFilePath, IsAppFolder);
             OnReload?.Invoke();
         }
 
-        public void Save()
+        public virtual void Save()
         {
             Setting.Save<T>(RelativeFilePath, Data, IsAppFolder);
             OnSaved?.Invoke();
-        }
-
-        public void OnResolved()
-        {
-            Reload();
         }
     }
 }

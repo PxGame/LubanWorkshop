@@ -10,6 +10,11 @@ namespace PluginTest
 {
     public class PluginEntry : IPlugin
     {
+        public override void OnResolved()
+        {
+            Console.WriteLine($"OnResolved 5 > {RootFolder} | {this.Config.Name}");
+        }
+
         public override async Task OnLoad()
         {
             Console.WriteLine($"OnLoad 5 > {new PluginDependency().GetName()} | {RootFolder}");

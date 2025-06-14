@@ -1,16 +1,42 @@
-﻿using System;
+﻿using LB.Core.Containers;
+using System;
 
 namespace LB.Core.Services.Settings
 {
-    public interface ICustomSetting
+    public class SaveScope : IDisposable
     {
-        string RelativePath { get; }
+        private ICustomSetting _setting;
 
+        public SaveScope(ICustomSetting setting)
+        {
+            this._setting = setting;
+        }
+
+        public void Dispose()
+        {
+            if (_setting != null)
+            {
+                _setting.Save();
+            }
+        }
+    }
+
+    public interface ICustomSetting : IOnResolved
+    {
+        bool IsAppFolder { get; init; }
         Action OnReload { get; set; }
         Action OnSaved { get; set; }
+        string RelativeFilePath { get; init; }
 
         void Reload();
 
         void Save();
+
+        SaveScope NewSaveScope();
+    }
+
+    public interface ICustomSetting<T> : ICustomSetting
+    {
+        T Data { get; }
     }
 }
