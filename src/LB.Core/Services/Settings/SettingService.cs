@@ -18,7 +18,7 @@ namespace LB.Core.Services.Settings
     internal class SettingService : ISettingService
     {
         [Inject]
-        [LogInfo(Tag = "设置服务")]
+        [Log(Tag = "设置服务")]
         private ILog Log { get; init; }
 
         [Inject]
@@ -74,7 +74,7 @@ namespace LB.Core.Services.Settings
             Log.Information($"OnServiceInitialize");
 
             MainSetting = Container.Resolve<ICustomSetting<MainSetting>>([new CustomSettingAttribute("setting.json") { IsAppFolder = true }]);
-            UserSetting = Container.Resolve<ICustomSetting<UserSetting>>([new CustomSettingAttribute("setting.json")]);
+            UserSetting = Container.Resolve<ICustomSetting<UserSetting>>([new CustomSettingAttribute("setting.json") { SubPath = "Settings/" }]);
 
             await Task.CompletedTask;
         }

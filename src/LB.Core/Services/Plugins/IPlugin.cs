@@ -17,7 +17,7 @@ namespace LB.Core.Services.Plugins
         Task OnUnload();
     }
 
-    [CustomSettingRoot(SubPath = "Plugins", GetNextSubPathMethodName = "GetCustomSettingNextSubPath")]
+    [CustomSettingRoot(SubPath = "Settings/Plugins/", GetNextSubPathMethodName = "GetCustomSettingNextSubPath")]
     public abstract class IPlugin<T> : IPlugin where T : class
     {
         [Inject] public IServiceCollection services { get; init; }
@@ -25,7 +25,7 @@ namespace LB.Core.Services.Plugins
         [Inject] public IPluginConfig Config { get; init; }
         [Inject] public ILog Log { get; init; }
 
-        [CustomSetting("usersetting.json")]
+        [CustomSetting("setting.json")]
         [Inject] public ICustomSetting<T> UserSetting { get; init; }
 
         protected virtual string GetCustomSettingNextSubPath()

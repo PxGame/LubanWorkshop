@@ -6,11 +6,7 @@ using System.Reflection;
 
 namespace LB.Core.Services.Logs
 {
-    public interface ILog<T> : ILog
-    {
-    }
-
-    internal class Log<T> : ILog<T>, ILogEventEnricher
+    internal class Log : ILog, ILogEventEnricher
     {
         private readonly ILogger _logger;
         private readonly string _tag;
@@ -83,16 +79,11 @@ namespace LB.Core.Services.Logs
 
         public virtual void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            string tag = _tag ?? typeof(T).Name;
-            var property = propertyFactory.CreateProperty("LogTag", tag, true);
-            logEvent.AddPropertyIfAbsent(property);
-        }
-    }
-
-    internal class LogNormal : Log<LogNormal>
-    {
-        public LogNormal(ILogger rootLogger, string tag) : base(rootLogger, tag)
-        {
+            if (!string.IsNullOrEmpty(_tag))
+            {
+                var property = propertyFactory.CreateProperty("LogTag", _tag, true);
+                logEvent.AddPropertyIfAbsent(property);
+            }
         }
     }
 }

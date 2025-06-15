@@ -18,7 +18,7 @@ namespace LB.Core.Services.Plugins
         private IContainer Container { get; init; }
 
         [Inject]
-        [LogInfo(Tag = "插件服务")]
+        [Log(Tag = "插件服务")]
         private ILog Log { get; init; }
 
         [Inject]

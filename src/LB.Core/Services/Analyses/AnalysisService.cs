@@ -14,7 +14,7 @@ namespace LB.Core.Services.Analyses
     internal class AnalysisService : IAnalysisService
     {
         [Inject]
-        [LogInfo(Tag = "诊断服务")]
+        [Log(Tag = "诊断服务")]
         private ILog Log { get; init; }
 
         [Inject]

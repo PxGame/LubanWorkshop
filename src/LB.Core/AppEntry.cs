@@ -25,8 +25,8 @@ namespace LB.Core
         public IServiceCollection Services => _services;
 
         [Inject]
-        [LogInfo(Tag = "程序入口")]
-        public ILog<AppEntry> Log { get; private set; }
+        [Log(Tag = "程序入口")]
+        public ILog Log { get; private set; }
 
         public AppEntry()
         {
