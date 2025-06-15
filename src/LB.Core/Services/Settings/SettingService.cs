@@ -43,28 +43,25 @@ namespace LB.Core.Services.Settings
         {
             CustomSettingAttribute settingInfo = extraInfos.FirstOrDefault(x => x is CustomSettingAttribute) as CustomSettingAttribute;
 
-            if (settingInfo != null && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ICustomSetting<>))
-            {
-                var settingPath = settingInfo.RelativePath;
-                if (!string.IsNullOrEmpty(settingInfo.GetFirstSubPathMethodName))
-                {
-                    var injectTarget = extraInfos.FirstOrDefault(x => x is InjectTarget) as InjectTarget;
-                    if (injectTarget == null || injectTarget.Target == null) { throw new ContainerException("InjectTarget 未找到或 Target 为空"); }
-                    var getFirstSubPathMethod = injectTarget.Target.GetType().GetMethod(settingInfo.GetFirstSubPathMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                    if (getFirstSubPathMethod == null) { throw new ContainerException($"未找到方法 {settingInfo.GetFirstSubPathMethodName}"); }
-                    var firstSubPath = getFirstSubPathMethod.Invoke(injectTarget.Target, null) as string;
-                    if (!string.IsNullOrEmpty(firstSubPath))
-                    {
-                        settingPath = Path.Combine(firstSubPath, settingPath).StandardizedPath();
-                    }
-                }
+            if (settingInfo == null || !type.IsGenericType || type.GetGenericTypeDefinition() != typeof(ICustomSetting<>)) { return null; }
 
-                var settingType = type.GetGenericArguments()[0];
-                var settingInstance = Activator.CreateInstance(typeof(CustomSetting<>).MakeGenericType(settingType), settingPath, settingInfo.IsAppFolder);
-                return settingInstance;
+            var injectTarget = extraInfos.FirstOrDefault(x => x is InjectTarget) as InjectTarget;
+            var settingPath = string.Empty;
+            if (injectTarget != null && injectTarget.Target != null)
+            {
+                var settingRoot = injectTarget.Target.GetType().GetCustomAttribute<CustomSettingRootAttribute>(true);
+                var rootSubPath = settingRoot.GetSubPath(injectTarget.Target);
+                settingPath = Path.Combine(settingPath, rootSubPath).StandardizedPath();
             }
 
-            return null;
+            if (!string.IsNullOrEmpty(settingInfo.RelativePath))
+            {
+                settingPath = Path.Combine(settingPath, settingInfo.RelativePath).StandardizedPath();
+            }
+
+            var settingType = type.GetGenericArguments()[0];
+            var settingInstance = Activator.CreateInstance(typeof(CustomSetting<>).MakeGenericType(settingType), settingPath, settingInfo.IsAppFolder);
+            return settingInstance;
         }
 
         public void OnInstanceReleased()
@@ -111,6 +108,12 @@ namespace LB.Core.Services.Settings
             var fullPath = Path.Combine(isAppFolder ? Utils.AppFolder : Utils.AppDataFolder, relativeFilePath);
             try
             {
+                var folder = Path.GetDirectoryName(fullPath);
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+
                 var jsonData = JsonConvert.SerializeObject(data, Formatting.Indented);
                 File.WriteAllText(fullPath, jsonData);
                 Log.Information($"配置文件已保存: {fullPath}");

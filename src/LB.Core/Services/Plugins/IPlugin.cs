@@ -1,6 +1,7 @@
 ﻿using LB.Core.Containers;
 using LB.Core.Services.Logs;
 using LB.Core.Services.Settings;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace LB.Core.Services.Plugins
@@ -16,6 +17,7 @@ namespace LB.Core.Services.Plugins
         Task OnUnload();
     }
 
+    [CustomSettingRoot(SubPath = "Plugins", GetNextSubPathMethodName = "GetCustomSettingNextSubPath")]
     public abstract class IPlugin<T> : IPlugin where T : class
     {
         [Inject] public IServiceCollection services { get; init; }
@@ -25,6 +27,11 @@ namespace LB.Core.Services.Plugins
 
         [CustomSetting("usersetting.json")]
         [Inject] public ICustomSetting<T> UserSetting { get; init; }
+
+        protected virtual string GetCustomSettingNextSubPath()
+        {
+            return Config.Name;
+        }
 
         public abstract void OnResolved();
 

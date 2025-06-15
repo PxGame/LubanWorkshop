@@ -170,7 +170,6 @@ namespace LB.Core.Containers
             var type = instance.GetType();
 
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
             foreach (var prop in properties)
             {
                 var inject = prop.GetCustomAttribute<InjectAttribute>(true);
