@@ -27,9 +27,6 @@ namespace LB.Core.Services.Plugins
         [Inject]
         private IAnalysisService Analysis { get; init; }
 
-        public string AppDataPluginsFolder { get; private set; }
-        public string AppPluginsFolder { get; private set; }
-
         private List<PluginController> controllers = new List<PluginController>();
 
         public PluginService()
@@ -39,9 +36,6 @@ namespace LB.Core.Services.Plugins
         public void OnResolved()
         {
             Log.Information($"OnResolved");
-
-            AppDataPluginsFolder = Path.Combine(Utils.AppDataFolder, "Plugins");
-            AppPluginsFolder = Path.Combine(Utils.AppFolder, "Plugins");
 
             Container.RegisterType<PluginController>();
             Container.RegisterType(typeof(IPlugin), OnCreatePlugin, false, null, true);
@@ -67,8 +61,8 @@ namespace LB.Core.Services.Plugins
 
         private async Task LoadAll()
         {
-            await LoadAllFromFolder(AppPluginsFolder);
-            await LoadAllFromFolder(AppDataPluginsFolder);
+            await LoadAllFromFolder(Utils.AppPluginsFolder);
+            await LoadAllFromFolder(Utils.AppDataPluginsFolder);
         }
 
         private async Task LoadAllFromFolder(string pluginsFolder)

@@ -15,7 +15,7 @@ namespace LB.Core.Services.Settings
         public string SubPath { get; set; }
         public string GetNextSubPathMethodName { get; set; }
 
-        internal string GetSubPath(object target)
+        internal string GetNextSubPath(object target)
         {
             var result = (SubPath ?? string.Empty).StandardizedPath(); ;
             if (!string.IsNullOrEmpty(GetNextSubPathMethodName))

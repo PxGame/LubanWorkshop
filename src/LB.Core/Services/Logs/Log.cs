@@ -2,6 +2,7 @@
 using Serilog.Core;
 using Serilog.Events;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace LB.Core.Services.Logs
@@ -9,12 +10,12 @@ namespace LB.Core.Services.Logs
     internal class Log : ILog, ILogEventEnricher
     {
         private readonly ILogger _logger;
-        private readonly string _tag;
+        private readonly Dictionary<string, object> _propertyDict;
 
-        public Log(ILogger rootlogger, string tag)
+        public Log(ILogger rootlogger, Dictionary<string, object> propertyDict)
         {
             _logger = rootlogger.ForContext(this);
-            _tag = tag;
+            _propertyDict = propertyDict;
         }
 
         public void Verbose(string messageTemplate)
@@ -79,10 +80,13 @@ namespace LB.Core.Services.Logs
 
         public virtual void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            if (!string.IsNullOrEmpty(_tag))
+            if (_propertyDict != null)
             {
-                var property = propertyFactory.CreateProperty("LogTag", _tag, true);
-                logEvent.AddPropertyIfAbsent(property);
+                foreach (var item in _propertyDict)
+                {
+                    var property = propertyFactory.CreateProperty(item.Key, item.Value, true);
+                    logEvent.AddPropertyIfAbsent(property);
+                }
             }
         }
     }

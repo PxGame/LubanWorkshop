@@ -26,10 +26,8 @@ namespace LB.Core.Services.Settings
 
         public string SettingPath { get; private set; }
 
-        [CustomSetting("setting")]
         public ICustomSetting<MainSetting> MainSetting { get; private set; }
 
-        [CustomSetting("setting")]
         public ICustomSetting<UserSetting> UserSetting { get; private set; }
 
         public void OnResolved()
@@ -50,7 +48,7 @@ namespace LB.Core.Services.Settings
             if (injectTarget != null && injectTarget.Target != null)
             {
                 var settingRoot = injectTarget.Target.GetType().GetCustomAttribute<CustomSettingRootAttribute>(true);
-                var rootSubPath = settingRoot.GetSubPath(injectTarget.Target);
+                var rootSubPath = settingRoot.GetNextSubPath(injectTarget.Target);
                 settingPath = Path.Combine(settingPath, rootSubPath).StandardizedPath();
             }
 
@@ -74,7 +72,7 @@ namespace LB.Core.Services.Settings
             Log.Information($"OnServiceInitialize");
 
             MainSetting = Container.Resolve<ICustomSetting<MainSetting>>([new CustomSettingAttribute("setting.json") { IsAppFolder = true }]);
-            UserSetting = Container.Resolve<ICustomSetting<UserSetting>>([new CustomSettingAttribute("setting.json") { SubPath = "Settings/" }]);
+            UserSetting = Container.Resolve<ICustomSetting<UserSetting>>([new CustomSettingAttribute("setting.json") { }]);
 
             await Task.CompletedTask;
         }
@@ -88,9 +86,15 @@ namespace LB.Core.Services.Settings
             await Task.CompletedTask;
         }
 
+        protected string GetFullPath(string relativeFilePath, bool isAppFolder)
+        {
+            var fullPath = Path.Combine(isAppFolder ? Utils.AppFolder : Utils.AppDataSettingsFolder, relativeFilePath).StandardizedPath();
+            return fullPath;
+        }
+
         public T Load<T>(string relativeFilePath, bool isAppFolder)
         {
-            var fullPath = Path.Combine(isAppFolder ? Utils.AppFolder : Utils.AppDataFolder, relativeFilePath);
+            var fullPath = GetFullPath(relativeFilePath, isAppFolder);
             try
             {
                 var jsonData = File.ReadAllText(fullPath);
@@ -105,7 +109,7 @@ namespace LB.Core.Services.Settings
 
         public void Save<T>(string relativeFilePath, T data, bool isAppFolder)
         {
-            var fullPath = Path.Combine(isAppFolder ? Utils.AppFolder : Utils.AppDataFolder, relativeFilePath);
+            var fullPath = GetFullPath(relativeFilePath, isAppFolder);
             try
             {
                 var folder = Path.GetDirectoryName(fullPath);
