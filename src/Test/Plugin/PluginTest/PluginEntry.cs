@@ -17,7 +17,9 @@ namespace PluginTest
     {
         public override void OnResolved()
         {
-            Log.Information($"OnResolved 5 > {RootFolder} | {this.Config.Name}");
+            Log.Information($"OnResolved 5 > {RootFolder} | {this.Config.Name} | {UserSetting.Data.Name}");
+
+            UserSetting.Data.Name = UserSetting.Data.Name + "0";
         }
 
         public override async Task OnLoad()

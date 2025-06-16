@@ -71,7 +71,7 @@ namespace LB.Core.Services.Plugins
             var folders = Directory.GetDirectories(pluginsFolder);
             foreach (var folder in folders)
             {
-                await LoadPluginFromFolder(folder);
+                await LoadPluginFromFolder(folder.StandardizedPath());
             }
         }
 

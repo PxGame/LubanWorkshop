@@ -20,7 +20,7 @@ namespace LB.Core.Services.Plugins
     }
 
     [LogRoot(GetLogPropertyDictMethodName = "GetLogPropertyDict")]
-    [CustomSettingRoot(SubPath = "Plugins/", GetNextSubPathMethodName = "GetCustomSettingNextSubPath")]
+    [CustomSettingRoot(GetNextSubPathMethodName = "GetCustomSettingNextSubPath")]
     public abstract class IPlugin<T> : IPlugin where T : class
     {
         [Inject] public IServiceCollection services { get; init; }
@@ -34,7 +34,7 @@ namespace LB.Core.Services.Plugins
 
         protected virtual string GetCustomSettingNextSubPath()
         {
-            return Config.Name;
+            return Path.Combine("Plugins", Config.Name).StandardizedPath();
         }
 
         protected virtual Dictionary<string, object> GetLogPropertyDict()
@@ -42,6 +42,7 @@ namespace LB.Core.Services.Plugins
             var result = new Dictionary<string, object>();
             //var datetime = DateTime.Now.ToString("yyyyMMddHHmmss");
             result["RelativeFilePath"] = Path.Combine("Plugins", Config.Name, $"plugin_.log");
+            result["LogTag"] = Config.Name;
             return result;
         }
 
