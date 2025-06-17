@@ -1,15 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Diagnostics.Metrics;
-using System;
 using System.Threading.Tasks;
-using Autofac.Features.AttributeFilters;
-using System.Reflection;
-using Autofac.Core;
-using MediatR;
 using LB.Core;
 using LB.Core.Containers;
 

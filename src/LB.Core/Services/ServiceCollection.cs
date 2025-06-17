@@ -1,5 +1,6 @@
 ﻿using LB.Core.Containers;
 using LB.Core.Services.Analyses;
+using LB.Core.Services.Events;
 using LB.Core.Services.Logs;
 using LB.Core.Services.Plugins;
 using LB.Core.Services.Settings;
@@ -16,6 +17,7 @@ namespace LB.Core.Services
         public IContainer Container { get; set; }
 
         public ILogService Log { get; set; }
+        public IEventService Event { get; set; }
         public ISettingService Setting { get; set; }
         public IAnalysisService Analysis { get; set; }
         public IPluginService Plugin { get; set; }
@@ -24,6 +26,7 @@ namespace LB.Core.Services
         {
             return [
                     typeof(ILogService),
+                    typeof(IEventService),
                     typeof(ISettingService),
                     typeof(IAnalysisService),
                     typeof(IPluginService)
@@ -33,6 +36,7 @@ namespace LB.Core.Services
         public IEnumerator<IService> GetEnumerator()
         {
             yield return Log;
+            yield return Event;
             yield return Setting;
             yield return Analysis;
             yield return Plugin;

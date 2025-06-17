@@ -1,6 +1,7 @@
 ﻿using LB.Core.Containers;
 using LB.Core.Services;
 using LB.Core.Services.Analyses;
+using LB.Core.Services.Events;
 using LB.Core.Services.Logs;
 using LB.Core.Services.Plugins;
 using LB.Core.Services.Settings;
@@ -41,6 +42,9 @@ namespace LB.Core
             Container.RegisterInstance<LogService, ILogService>()
                 .OnResolved((r, t) => _services.Log = t as ILogService)
                 .OnReleased((r) => _services.Log = null);
+            Container.RegisterInstance<EventService, IEventService>()
+                .OnResolved((r, t) => _services.Event = t as IEventService)
+                .OnReleased((r) => _services.Event = null);
             Container.RegisterInstance<SettingService, ISettingService>()
                 .OnResolved((r, t) => _services.Setting = t as ISettingService)
                 .OnReleased((r) => _services.Setting = null);
