@@ -8,8 +8,28 @@ using System.Threading.Tasks;
 
 namespace LB.Core.Services.Events
 {
-    public class EventSource
+    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
+    public class ListenerRootAttribute : Attribute
+    { }
+
+    [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
+    public class ListenerAttribute : Attribute
     {
+        public string EventName { get; init; }
+
+        public ListenerAttribute(string eventName)
+        {
+            EventName = eventName ?? throw new ArgumentNullException(nameof(eventName));
+        }
+    }
+
+    public abstract class IListenerSource
+    {
+        public string EventName { get; init; }
+
+        public void Trigger(object[] args)
+        {
+        }
     }
 
     internal class EventService : IEventService
@@ -18,30 +38,35 @@ namespace LB.Core.Services.Events
         [Log(Tag = "事件服务")]
         private ILog Log { get; init; }
 
-        private Dictionary<string, List<EventSource>> _eventDict = new Dictionary<string, List<EventSource>>();
+        private List<IListenerSource> _listeners = new List<IListenerSource>();
 
-        //public void Trigger(string eventName, params object[] args)
-        //{
-        //    Log.Information($"Trigger event: {eventName} with args: {string.Join(", ", args.Select(a => a?.ToString() ?? "null"))}");
-        //    if (_eventDict.TryGetValue(eventName, out var sources))
-        //    {
-        //        foreach (var source in sources)
-        //        {
-        //            // Handle the event for each source
-        //            // This is where you would invoke the event handlers
-        //        }
-        //    }
-        //}
+        public void AddListener(IListenerSource eventSource)
+        {
+            if (eventSource == null) { throw new ArgumentNullException(nameof(eventSource)); }
+            _listeners.Add(eventSource);
+        }
 
-        //public void Register(string eventName, EventSource source)
-        //{
-        //    Log.Information($"Register event: {eventName} for source: {source}");
-        //    if (!_eventDict.ContainsKey(eventName))
-        //    {
-        //        _eventDict[eventName] = new List<EventSource>();
-        //    }
-        //    _eventDict[eventName].Add(source);
-        //}
+        public void RemoveListener(IListenerSource eventSource)
+        {
+            _listeners.RemoveAll(e => e == eventSource);
+        }
+
+        public void AddListeners(object owner)
+        {
+        }
+
+        public void RemoveListeners(object owner)
+        {
+        }
+
+        public void Trigger(string eventName, object[] args)
+        {
+            Log.Debug($"Trigger event: {eventName} with args: {string.Join(", ", args.Select(a => a?.ToString() ?? "null"))}");
+            foreach (var listener in _listeners.Where(l => l.EventName == eventName))
+            {
+                listener.Trigger(args);
+            }
+        }
 
         public void OnInstanceReleased()
         {
