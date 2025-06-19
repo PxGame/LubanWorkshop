@@ -25,6 +25,7 @@ namespace LB.Core.Services.Events
 
     public abstract class IListenerSource
     {
+        public string GroupName { get; init; }
         public string EventName { get; init; }
 
         public void Trigger(object[] args)
@@ -34,6 +35,9 @@ namespace LB.Core.Services.Events
 
     internal class EventService : IEventService
     {
+        [Inject]
+        private IContainer Container { get; init; }
+
         [Inject]
         [Log(Tag = "事件服务")]
         private ILog Log { get; init; }
@@ -59,10 +63,9 @@ namespace LB.Core.Services.Events
         {
         }
 
-        public void Trigger(string eventName, object[] args)
+        public void Trigger(string groupName, string eventName, object[] args)
         {
-            Log.Debug($"Trigger event: {eventName} with args: {string.Join(", ", args.Select(a => a?.ToString() ?? "null"))}");
-            foreach (var listener in _listeners.Where(l => l.EventName == eventName))
+            foreach (var listener in _listeners.Where(l => l.GroupName == groupName && l.EventName == eventName))
             {
                 listener.Trigger(args);
             }
