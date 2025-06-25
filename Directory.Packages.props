@@ -1,36 +1,43 @@
 <Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageVersion Include="Autofac" Version="8.3.0" />
-    <PackageVersion Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
-    <PackageVersion Include="Avalonia" Version="11.3.0" />
-    <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.0" />
-    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.0" />
-    <PackageVersion Include="Avalonia.Diagnostics" Version="11.3.0" />
-    <PackageVersion Include="Avalonia.Desktop" Version="11.3.0" />
-    <PackageVersion Include="Avalonia.iOS" Version="11.3.0" />
-    <PackageVersion Include="Avalonia.Browser" Version="11.3.0" />
-    <PackageVersion Include="Avalonia.Android" Version="11.3.0" />
-    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageVersion Include="MediatR" Version="12.5.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.5" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.5" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.5" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.5" />
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="Serilog" Version="4.3.0" />
-    <PackageVersion Include="Serilog.Expressions" Version="5.0.0" />
-    <PackageVersion Include="Serilog.Extensions.Hosting" Version="9.0.0" />
-    <PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.1" />
-    <PackageVersion Include="Serilog.Settings.Configuration" Version="9.0.0" />
-    <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
-    <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageVersion Include="Serilog.Sinks.Map" Version="2.0.0" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
-    <PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />
-  </ItemGroup>
+	<PropertyGroup>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+		<CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
+		<AvaloniaVersion>11.3.2</AvaloniaVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<!--AvaloniaUI-->
+		<PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
+		<PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+		<PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+		<PackageVersion Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+		<PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+		<PackageVersion Include="Avalonia.iOS" Version="$(AvaloniaVersion)" />
+		<PackageVersion Include="Avalonia.Browser" Version="$(AvaloniaVersion)" />
+		<PackageVersion Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
+		<PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
+		<PackageVersion Include="Avalonia.Controls.ColorPicker" Version="$(AvaloniaVersion)" />
+
+		<!--MVVM-->
+		<PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+
+		<!--JSON-->
+		<PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+
+		<!--Log-->
+		<PackageVersion Include="Serilog" Version="4.3.0" />
+		<PackageVersion Include="Serilog.Expressions" Version="5.0.0" />
+		<PackageVersion Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+		<PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.1" />
+		<PackageVersion Include="Serilog.Settings.Configuration" Version="9.0.0" />
+		<PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
+		<PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
+		<PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+		<PackageVersion Include="Serilog.Sinks.Map" Version="2.0.0" />
+
+		<!--CommandLine-->
+		<PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+
+		<!--Android-->
+		<PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />
+	</ItemGroup>
 </Project>
