@@ -1,5 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using LB.Core.Services.Plugins;
+using Luban.Core.Services.Plugins;
 using System;
 
 while (true)

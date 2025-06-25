@@ -1,7 +1,7 @@
-﻿using LB.Core.Containers;
-using LB.Core.Services;
-using LB.Core.Services.Plugins;
-using LB.Plugin;
+﻿using Luban.Core.Containers;
+using Luban.Core.Services;
+using Luban.Core.Services.Plugins;
+using Luban.Plugin;
 using PluginTestDependency;
 using System;
 using System.Threading.Tasks;

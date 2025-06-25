@@ -5,7 +5,7 @@
 		<Company>FlamingCore</Company>
 		<Authors>PeterXiang</Authors>
 		<Version>1.0.0.0</Version>
-		<Product>LubanWorkshop</Product>
+		<Product>Luban</Product>
 		<Copyright>Copyright (C) 2025 PeterXiang</Copyright>
 		<UseArtifactsOutput>true</UseArtifactsOutput>
 		<ArtifactsPath>$(MSBuildThisFileDirectory)build</ArtifactsPath>

@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\LB.Core\LB.Core.csproj" />
+    <ProjectReference Include="..\..\src\Luban.Core\Luban.Core.csproj" />
     <ProjectReference Include="..\PluginTestDependency\PluginTestDependency.csproj" />
   </ItemGroup>
 

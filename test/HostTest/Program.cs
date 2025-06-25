@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using System.Threading.Tasks;
-using LB.Core;
-using LB.Core.Containers;
+using Luban.Core;
+using Luban.Core.Containers;
 
 internal class Program
 {
