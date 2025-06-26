@@ -1,7 +1,6 @@
 ﻿using Luban.Core.Containers;
 using Luban.Core.Services.Logs;
 using Luban.Core.Services.Settings;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -19,8 +18,8 @@ namespace Luban.Core.Services.Plugins
         Task OnUnload();
     }
 
-    [LogRoot(GetLogPropertyDictMethodName = "GetLogPropertyDict")]
-    [CustomSettingRoot(GetNextSubPathMethodName = "GetCustomSettingNextSubPath")]
+    [LogRoot(GetLogPropertyDictMethodName = nameof(GetLogPropertyDict))]
+    [CustomSettingRoot(GetNextSubPathMethodName = nameof(GetCustomSettingNextSubPath))]
     public abstract class IPlugin<T> : IPlugin where T : class
     {
         [Inject] public IServiceCollection services { get; init; }

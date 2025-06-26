@@ -2,7 +2,7 @@
 
 namespace Luban.Core.Services.Analyses
 {
-    public interface IAnalysisService : IService
+    public abstract class IAnalysisService : IService
     {
     }
 }

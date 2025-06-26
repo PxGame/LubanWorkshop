@@ -3,7 +3,6 @@ using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Luban.Core.Services.Logs
 {

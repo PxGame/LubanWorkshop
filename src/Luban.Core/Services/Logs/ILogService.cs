@@ -2,7 +2,7 @@
 
 namespace Luban.Core.Services.Logs
 {
-    public interface ILogService : IService
+    public abstract class ILogService : IService
     {
     }
 }

@@ -9,23 +9,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Luban.Core.Services.Plugins
 {
     internal class PluginService : IPluginService, IOnResolved
     {
-        [Inject]
-        private IContainer Container { get; init; }
-
-        [Inject]
-        [Log(Tag = "插件服务")]
-        private ILog Log { get; init; }
-
-        [Inject]
-        private ISettingService Setting { get; init; }
-
-        [Inject]
-        private IAnalysisService Analysis { get; init; }
+        private ISettingService Setting { get; set; }
+        private IAnalysisService Analysis { get; set; }
+        private ILog Log { get; set; }
 
         private List<PluginController> controllers = new List<PluginController>();
 
@@ -33,10 +25,8 @@ namespace Luban.Core.Services.Plugins
         {
         }
 
-        public void OnResolved()
+        public override void OnResolved()
         {
-            Log.Information($"OnResolved");
-
             Container.RegisterType<PluginController>();
             Container.RegisterType(typeof(IPlugin), OnCreatePlugin, false, null, true);
         }
@@ -46,14 +36,23 @@ namespace Luban.Core.Services.Plugins
             return Activator.CreateInstance(type);
         }
 
-        public void OnInstanceReleased()
+        public override void OnInstanceReleased()
         {
             Log.Information($"OnInstanceReleased");
         }
 
-        public async Task OnServiceInitialize()
+        public override async Task OnServiceInitialing()
         {
-            Log.Information($"OnServiceInitialize");
+            await Task.CompletedTask;
+        }
+
+        public override async Task OnServiceInitialized()
+        {
+            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = "插件服务" }]);
+            Log.Information($"OnServiceInitialized");
+
+            Setting = Container.Resolve<ISettingService>();
+            Analysis = Container.Resolve<IAnalysisService>();
 
             await LoadAll();
             await Task.CompletedTask;
@@ -80,7 +79,7 @@ namespace Luban.Core.Services.Plugins
             return await Load(folder);
         }
 
-        public async Task OnServiceShutdown()
+        public override async Task OnServiceShutdown()
         {
             Log.Information($"OnServiceShutdown");
 

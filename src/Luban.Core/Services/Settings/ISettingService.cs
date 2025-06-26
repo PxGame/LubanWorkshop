@@ -2,10 +2,10 @@
 
 namespace Luban.Core.Services.Settings
 {
-    public interface ISettingService : IService
+    public abstract class ISettingService : IService
     {
-        T Load<T>(string relativeFilePath, bool isAppFolder);
+        public abstract T Load<T>(string relativeFilePath, bool isAppFolder);
 
-        void Save<T>(string relativeFilePath, T data, bool isAppFolder);
+        public abstract void Save<T>(string relativeFilePath, T data, bool isAppFolder);
     }
 }

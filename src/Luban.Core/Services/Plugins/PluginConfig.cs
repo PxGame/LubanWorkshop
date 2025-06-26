@@ -33,5 +33,7 @@ namespace Luban.Plugin
         public string AuthorEmail { get; set; }
 
         public Uri AuthorUrl { get; set; }
+
+        public PluginPlatform Platforms { get; set; }
     }
 }

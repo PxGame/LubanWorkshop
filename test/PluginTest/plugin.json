@@ -18,5 +18,6 @@
   "EntryName": "PluginTest",
   "AuthorName": "Test Author",
   "AuthorEmail": "565067150@qq.com",
-  "AuthorUrl": "https://docs.unity.cn/Manual/upm-manifestPkg.html"
+  "AuthorUrl": "https://docs.unity.cn/Manual/upm-manifestPkg.html",
+  "Platforms": 3
 }

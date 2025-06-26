@@ -7,6 +7,11 @@ namespace Luban.Core.Containers
     {
         #region Resovle
 
+        public T Resolve<T>() where T : class
+        {
+            return Resolve(typeof(T), [], [], null) as T;
+        }
+
         public T Resolve<T>(List<object> extraInfos) where T : class
         {
             return Resolve(typeof(T), extraInfos, [], null) as T;

@@ -17,12 +17,7 @@ namespace Luban.Core.Services.Settings
 {
     internal class SettingService : ISettingService
     {
-        [Inject]
-        [Log(Tag = "设置服务")]
-        private ILog Log { get; init; }
-
-        [Inject]
-        private IContainer Container { get; init; }
+        private ILog Log { get; set; }
 
         public string SettingPath { get; private set; }
 
@@ -30,11 +25,12 @@ namespace Luban.Core.Services.Settings
 
         public ICustomSetting<UserSetting> UserSetting { get; private set; }
 
-        public void OnResolved()
+        public override void OnResolved()
         {
             Container.RegisterType(typeof(ICustomSetting<>), OnCreateSetting, false, null, false);
 
-            Log.Information($"\nAppFolder : {Utils.AppFolder}\nAppDataFolder : {Utils.AppDataFolder}");
+            MainSetting = Container.Resolve<ICustomSetting<MainSetting>>([new CustomSettingAttribute("setting.json") { IsAppFolder = true }]);
+            UserSetting = Container.Resolve<ICustomSetting<UserSetting>>([new CustomSettingAttribute("setting.json") { }]);
         }
 
         private object OnCreateSetting(IRegistration regist, Type type, List<object> extraInfos, object[] args)
@@ -62,22 +58,26 @@ namespace Luban.Core.Services.Settings
             return settingInstance;
         }
 
-        public void OnInstanceReleased()
+        public override void OnInstanceReleased()
         {
             Log.Information($"OnInstanceReleased");
         }
 
-        public async Task OnServiceInitialize()
+        public override async Task OnServiceInitialing()
         {
-            Log.Information($"OnServiceInitialize");
+            await Task.CompletedTask;
+        }
 
-            MainSetting = Container.Resolve<ICustomSetting<MainSetting>>([new CustomSettingAttribute("setting.json") { IsAppFolder = true }]);
-            UserSetting = Container.Resolve<ICustomSetting<UserSetting>>([new CustomSettingAttribute("setting.json") { }]);
+        public override async Task OnServiceInitialized()
+        {
+            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = "设置服务" }]);
+            Log.Information($"OnServiceInitialized");
+            Log.Information($"\nAppFolder : {Utils.AppFolder}\nAppDataFolder : {Utils.AppDataFolder}");
 
             await Task.CompletedTask;
         }
 
-        public async Task OnServiceShutdown()
+        public override async Task OnServiceShutdown()
         {
             Log.Information($"OnServiceShutdown");
 
@@ -92,7 +92,7 @@ namespace Luban.Core.Services.Settings
             return fullPath;
         }
 
-        public T Load<T>(string relativeFilePath, bool isAppFolder)
+        public override T Load<T>(string relativeFilePath, bool isAppFolder)
         {
             var fullPath = GetFullPath(relativeFilePath, isAppFolder);
             try
@@ -107,7 +107,7 @@ namespace Luban.Core.Services.Settings
             }
         }
 
-        public void Save<T>(string relativeFilePath, T data, bool isAppFolder)
+        public override void Save<T>(string relativeFilePath, T data, bool isAppFolder)
         {
             var fullPath = GetFullPath(relativeFilePath, isAppFolder);
             try

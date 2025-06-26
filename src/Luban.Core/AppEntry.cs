@@ -25,8 +25,6 @@ namespace Luban.Core
         public IContainer Container => _container;
         public IServiceCollection Services => _services;
 
-        [Inject]
-        [Log(Tag = "程序入口")]
         public ILog Log { get; private set; }
 
         public AppEntry()
@@ -61,13 +59,18 @@ namespace Luban.Core
             }
             Container.RegisterInstance<IServiceCollection>((_, _, _, _) => Services);
 
-            Container.Inject(this, null);
-            Log.Information($"Initialize start ...");
             foreach (var service in Services)
             {
-                await service.OnServiceInitialize();
+                await service.OnServiceInitialing();
             }
-            Log.Information($"Initialize end .");
+
+            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = "程序入口" }]);
+            Log.Information($"Initialized start ...");
+            foreach (var service in Services)
+            {
+                await service.OnServiceInitialized();
+            }
+            Log.Information($"Initialized end .");
         }
 
         public async Task Shutdown()

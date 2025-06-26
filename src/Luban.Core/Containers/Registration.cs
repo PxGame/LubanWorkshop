@@ -1,8 +1,5 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using static Luban.Core.Containers.IRegistration;
 
 namespace Luban.Core.Containers
 {

@@ -2,7 +2,7 @@
 
 namespace Luban.Core.Services.Events
 {
-    public interface IEventService : IService
+    public abstract class IEventService : IService
     {
     }
 }

@@ -13,14 +13,52 @@ namespace Luban.Core.Services.Logs
 {
     internal class LogService : ILogService
     {
-        [Inject]
-        private IContainer Container { get; init; }
-
         private ILog Log { get; set; }
 
         private ILogger _rootLogger;
 
-        public void OnResolved()
+        public override void OnResolved()
+        {
+            Container.RegisterType(typeof(ILog), OnCreateLog, false, null, false);
+        }
+
+        private object OnCreateLog(IRegistration regist, Type type, List<object> extraInfos, object[] args)
+        {
+            var dict = new Dictionary<string, object>();
+
+            var logAttr = extraInfos?.FirstOrDefault(x => x is LogAttribute) as LogAttribute;
+            if (logAttr != null && !string.IsNullOrEmpty(logAttr.Tag))
+            {
+                dict["LogTag"] = logAttr.Tag;
+            }
+
+            var injectTarget = extraInfos.FirstOrDefault(x => x is InjectTarget) as InjectTarget;
+            if (injectTarget != null && injectTarget.Target != null)
+            {
+                var logRootAttr = injectTarget.Target.GetType().GetCustomAttribute<LogRootAttribute>(true);
+                if (logRootAttr != null)
+                {
+                    var propertyDict = logRootAttr.GetLogPropertyDict(injectTarget.Target);
+                    if (propertyDict != null && propertyDict.Count > 0)
+                    {
+                        foreach (var kvp in propertyDict)
+                        {
+                            dict[kvp.Key] = kvp.Value;
+                        }
+                    }
+                }
+            }
+
+            return new Log(_rootLogger, dict);
+        }
+
+        public override void OnInstanceReleased()
+        {
+            Log.Information($"OnInstanceReleased");
+            Serilog.Log.CloseAndFlush();
+        }
+
+        public override async Task OnServiceInitialing()
         {
             var logFormat = "[{@t:yyyy-MM-dd HH:mm:ss.fff}]" +
                 "[{@l:u3}]" +
@@ -54,56 +92,17 @@ namespace Luban.Core.Services.Logs
                 })
                 .CreateLogger();
 
-            Container.RegisterType(typeof(ILog), OnCreateLog, false, null, false);
-
-            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = "日志服务" }]);
-
-            Log.Information($"OnResolved");
-        }
-
-        private object OnCreateLog(IRegistration regist, Type type, List<object> extraInfos, object[] args)
-        {
-            var dict = new Dictionary<string, object>();
-
-            var logAttr = extraInfos?.FirstOrDefault(x => x is LogAttribute) as LogAttribute;
-            if (logAttr != null && !string.IsNullOrEmpty(logAttr.Tag))
-            {
-                dict["LogTag"] = logAttr.Tag;
-            }
-
-            var injectTarget = extraInfos.FirstOrDefault(x => x is InjectTarget) as InjectTarget;
-            if (injectTarget != null && injectTarget.Target != null)
-            {
-                var logRootAttr = injectTarget.Target.GetType().GetCustomAttribute<LogRootAttribute>(true);
-                if (logRootAttr != null)
-                {
-                    var propertyDict = logRootAttr.GetLogPropertyDict(injectTarget.Target);
-                    if (propertyDict != null && propertyDict.Count > 0)
-                    {
-                        foreach (var kvp in propertyDict)
-                        {
-                            dict[kvp.Key] = kvp.Value;
-                        }
-                    }
-                }
-            }
-
-            return new Log(_rootLogger, dict);
-        }
-
-        public void OnInstanceReleased()
-        {
-            Log.Information($"OnInstanceReleased");
-            Serilog.Log.CloseAndFlush();
-        }
-
-        public async Task OnServiceInitialize()
-        {
-            Log.Information($"OnServiceInitialize");
             await Task.CompletedTask;
         }
 
-        public async Task OnServiceShutdown()
+        public override async Task OnServiceInitialized()
+        {
+            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = "日志服务" }]);
+            Log.Information($"OnServiceInitialized");
+            await Task.CompletedTask;
+        }
+
+        public override async Task OnServiceShutdown()
         {
             Log.Information($"OnServiceShutdown");
             await Task.CompletedTask;

@@ -3,10 +3,18 @@ using System.Threading.Tasks;
 
 namespace Luban.Services
 {
-    public interface IService : IOnResolved, IOnInstanceReleased
+    public abstract class IService : IOnResolved, IOnInstanceReleased
     {
-        Task OnServiceInitialize();
+        [Inject] protected IContainer Container { get; init; }
 
-        Task OnServiceShutdown();
+        public abstract void OnResolved();
+
+        public abstract void OnInstanceReleased();
+
+        public abstract Task OnServiceInitialing();
+
+        public abstract Task OnServiceInitialized();
+
+        public abstract Task OnServiceShutdown();
     }
 }

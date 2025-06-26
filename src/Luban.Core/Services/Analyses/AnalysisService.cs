@@ -8,35 +8,39 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Luban.Core.Services.Analyses
 {
     internal class AnalysisService : IAnalysisService
     {
-        [Inject]
-        [Log(Tag = "诊断服务")]
-        private ILog Log { get; init; }
+        private ILog Log { get; set; }
+        private ISettingService Setting { get; set; }
 
-        [Inject]
-        private ISettingService Setting { get; init; }
-
-        public void OnInstanceReleased()
+        public override void OnInstanceReleased()
         {
             Log.Information($"OnInstanceReleased");
         }
 
-        public void OnResolved()
+        public override void OnResolved()
         {
-            Log.Information($"OnResolved");
         }
 
-        public async Task OnServiceInitialize()
+        public override async Task OnServiceInitialing()
         {
-            Log.Information($"OnServiceInitialize");
             await Task.CompletedTask;
         }
 
-        public async Task OnServiceShutdown()
+        public override async Task OnServiceInitialized()
+        {
+            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = "诊断服务" }]);
+            Log.Information($"OnServiceInitialized");
+            Setting = Container.Resolve<ISettingService>();
+
+            await Task.CompletedTask;
+        }
+
+        public override async Task OnServiceShutdown()
         {
             Log.Information($"OnServiceShutdown");
             await Task.CompletedTask;

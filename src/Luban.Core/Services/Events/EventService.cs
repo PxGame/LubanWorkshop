@@ -35,14 +35,13 @@ namespace Luban.Core.Services.Events
 
     internal class EventService : IEventService
     {
-        [Inject]
-        private IContainer Container { get; init; }
-
-        [Inject]
-        [Log(Tag = "事件服务")]
-        private ILog Log { get; init; }
+        private ILog Log { get; set; }
 
         private List<IListenerSource> _listeners = new List<IListenerSource>();
+
+        public override void OnResolved()
+        {
+        }
 
         public void AddListener(IListenerSource eventSource)
         {
@@ -71,23 +70,24 @@ namespace Luban.Core.Services.Events
             }
         }
 
-        public void OnInstanceReleased()
+        public override void OnInstanceReleased()
         {
             Log.Information($"OnInstanceReleased");
         }
 
-        public void OnResolved()
+        public override async Task OnServiceInitialing()
         {
-            Log.Information($"OnResolved");
-        }
-
-        public async Task OnServiceInitialize()
-        {
-            Log.Information($"OnServiceInitialize");
             await Task.CompletedTask;
         }
 
-        public async Task OnServiceShutdown()
+        public override async Task OnServiceInitialized()
+        {
+            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = "事件服务" }]);
+            Log.Information($"OnServiceInitialized");
+            await Task.CompletedTask;
+        }
+
+        public override async Task OnServiceShutdown()
         {
             Log.Information($"OnServiceShutdown");
             await Task.CompletedTask;

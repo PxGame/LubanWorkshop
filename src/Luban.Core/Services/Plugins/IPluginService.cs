@@ -2,7 +2,7 @@
 
 namespace Luban.Core.Services.Plugins
 {
-    public interface IPluginService : IService
+    public abstract class IPluginService : IService
     {
     }
 }
