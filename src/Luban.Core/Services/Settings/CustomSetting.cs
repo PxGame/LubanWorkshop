@@ -5,7 +5,6 @@ namespace Luban.Core.Services.Settings
 {
     public class CustomSetting<T> : ICustomSetting<T>
     {
-        [Inject]
         public ISettingService Setting { get; init; }
 
         public bool IsAppFolder { get; init; }
@@ -15,8 +14,9 @@ namespace Luban.Core.Services.Settings
         public Action OnSaved { get; set; }
         public T Data { get; private set; }
 
-        public CustomSetting(string relativePath, bool isAppFolder)
+        public CustomSetting(ISettingService setting, string relativePath, bool isAppFolder)
         {
+            Setting = setting;
             RelativeFilePath = relativePath;
             IsAppFolder = isAppFolder;
         }

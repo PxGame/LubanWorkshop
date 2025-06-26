@@ -54,7 +54,7 @@ namespace Luban.Core.Services.Settings
             }
 
             var settingType = type.GetGenericArguments()[0];
-            var settingInstance = Activator.CreateInstance(typeof(CustomSetting<>).MakeGenericType(settingType), settingPath, settingInfo.IsAppFolder);
+            var settingInstance = Activator.CreateInstance(typeof(CustomSetting<>).MakeGenericType(settingType), this, settingPath, settingInfo.IsAppFolder);
             return settingInstance;
         }
 
@@ -100,9 +100,8 @@ namespace Luban.Core.Services.Settings
                 var jsonData = File.ReadAllText(fullPath);
                 return JsonConvert.DeserializeObject<T>(jsonData);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Log.Error(ex, $"配置文件解析失败, 返回默认值: {fullPath}");
                 return Activator.CreateInstance<T>();
             }
         }

@@ -5,7 +5,7 @@ namespace Luban.Core
 {
     public static class Utils
     {
-        public static string AppName => "LubanWorkshop";
+        public static string AppName => "Luban";
         public static string AppFolder { get; }
         public static string AppDataFolder { get; }
         public static string AppLogFolder { get; }
