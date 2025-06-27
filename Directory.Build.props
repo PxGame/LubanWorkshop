@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
-		<FrameworkVersion>net8.0</FrameworkVersion>
+		<FrameworkVersion>net9.0</FrameworkVersion>
 
 		<TargetFramework>$(FrameworkVersion)</TargetFramework>
 		<IOSFramework>$(FrameworkVersion)-ios</IOSFramework>
