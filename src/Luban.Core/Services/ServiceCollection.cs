@@ -4,6 +4,7 @@ using Luban.Core.Services.Events;
 using Luban.Core.Services.Logs;
 using Luban.Core.Services.Plugins;
 using Luban.Core.Services.Settings;
+using Luban.Core.Services.Storages;
 using Luban.Services;
 using System;
 using System.Collections;
@@ -13,12 +14,10 @@ namespace Luban.Core.Services
 {
     public class ServiceCollection : IServiceCollection
     {
-        public IAppEntry AppEntry { get; set; }
-        public IContainer Container { get; set; }
-
         public ILogService Log { get; set; }
         public IEventService Event { get; set; }
         public ISettingService Setting { get; set; }
+        public IStorageService Storage { get; set; }
         public IAnalysisService Analysis { get; set; }
         public IPluginService Plugin { get; set; }
 
@@ -28,6 +27,7 @@ namespace Luban.Core.Services
                     typeof(ILogService),
                     typeof(IEventService),
                     typeof(ISettingService),
+                    typeof(IStorageService),
                     typeof(IAnalysisService),
                     typeof(IPluginService)
                 ];
@@ -38,6 +38,7 @@ namespace Luban.Core.Services
             yield return Log;
             yield return Event;
             yield return Setting;
+            yield return Storage;
             yield return Analysis;
             yield return Plugin;
         }

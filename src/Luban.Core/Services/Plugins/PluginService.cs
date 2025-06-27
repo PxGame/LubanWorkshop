@@ -17,7 +17,6 @@ namespace Luban.Core.Services.Plugins
     {
         private ISettingService Setting { get; set; }
         private IAnalysisService Analysis { get; set; }
-        private ILog Log { get; set; }
 
         private List<PluginController> controllers = new List<PluginController>();
 
@@ -48,7 +47,7 @@ namespace Luban.Core.Services.Plugins
 
         public override async Task OnServiceInitialized()
         {
-            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = "插件服务" }]);
+            await base.OnServiceInitialized();
             Log.Information($"OnServiceInitialized");
 
             Setting = Container.Resolve<ISettingService>();

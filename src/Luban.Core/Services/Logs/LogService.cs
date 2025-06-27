@@ -13,8 +13,6 @@ namespace Luban.Core.Services.Logs
 {
     internal class LogService : ILogService
     {
-        private ILog Log { get; set; }
-
         private ILogger _rootLogger;
 
         public override void OnResolved()
@@ -97,7 +95,7 @@ namespace Luban.Core.Services.Logs
 
         public override async Task OnServiceInitialized()
         {
-            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = "日志服务" }]);
+            await base.OnServiceInitialized();
             Log.Information($"OnServiceInitialized");
             await Task.CompletedTask;
         }

@@ -5,6 +5,7 @@ using Luban.Core.Services.Events;
 using Luban.Core.Services.Logs;
 using Luban.Core.Services.Plugins;
 using Luban.Core.Services.Settings;
+using Luban.Core.Services.Storages;
 using Luban.Services;
 using Serilog;
 using System;
@@ -34,9 +35,8 @@ namespace Luban.Core
 
         public async Task Initialize()
         {
-            _services.AppEntry = this;
-            _services.Container = Container;
-
+            //注册服务
+            Container.RegisterInstance<IServiceCollection>((_, _, _, _) => _services);
             Container.RegisterInstance<LogService, ILogService>()
                 .OnResolved((r, t) => _services.Log = t as ILogService)
                 .OnReleased((r) => _services.Log = null);
@@ -46,6 +46,9 @@ namespace Luban.Core
             Container.RegisterInstance<SettingService, ISettingService>()
                 .OnResolved((r, t) => _services.Setting = t as ISettingService)
                 .OnReleased((r) => _services.Setting = null);
+            Container.RegisterInstance<StorageService, IStorageService>()
+                .OnResolved((r, t) => _services.Storage = t as IStorageService)
+                .OnReleased((r) => _services.Storage = null);
             Container.RegisterInstance<AnalysisService, IAnalysisService>()
                 .OnResolved((r, t) => _services.Analysis = t as IAnalysisService)
                 .OnReleased((r) => _services.Analysis = null);
@@ -53,18 +56,22 @@ namespace Luban.Core
                 .OnResolved((r, t) => _services.Plugin = t as IPluginService)
                 .OnReleased((r) => _services.Plugin = null);
 
+            //实例化服务
             foreach (var serviceType in Services.GetServiceTypes())
             {
                 Container.Resolve(serviceType, [], [], null);
             }
-            Container.RegisterInstance<IServiceCollection>((_, _, _, _) => Services);
 
+            //初始化服务中
             foreach (var service in Services)
             {
                 await service.OnServiceInitialing();
             }
 
+            //初始化日志
             Log = Container.Resolve<ILog>([new LogAttribute() { Tag = "程序入口" }]);
+
+            //初始化服务完成
             Log.Information($"Initialized start ...");
             foreach (var service in Services)
             {

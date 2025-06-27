@@ -35,8 +35,6 @@ namespace Luban.Core.Services.Events
 
     internal class EventService : IEventService
     {
-        private ILog Log { get; set; }
-
         private List<IListenerSource> _listeners = new List<IListenerSource>();
 
         public override void OnResolved()
@@ -82,7 +80,7 @@ namespace Luban.Core.Services.Events
 
         public override async Task OnServiceInitialized()
         {
-            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = "事件服务" }]);
+            await base.OnServiceInitialized();
             Log.Information($"OnServiceInitialized");
             await Task.CompletedTask;
         }

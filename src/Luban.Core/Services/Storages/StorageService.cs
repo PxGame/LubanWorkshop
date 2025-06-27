@@ -1,28 +1,21 @@
-﻿using Luban.Core.Containers;
-using Luban.Core.Services.Logs;
-using Luban.Core.Services.Plugins;
-using Luban.Core.Services.Settings;
+﻿using Luban.Core.Services.Logs;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Luban.Core.Services.Analyses
+namespace Luban.Core.Services.Storages
 {
-    internal class AnalysisService : IAnalysisService
+    internal class StorageService : IStorageService
     {
-        private ISettingService Setting { get; set; }
+        public override void OnResolved()
+        {
+        }
 
         public override void OnInstanceReleased()
         {
             Log.Information($"OnInstanceReleased");
-        }
-
-        public override void OnResolved()
-        {
         }
 
         public override async Task OnServiceInitialing()
@@ -34,8 +27,6 @@ namespace Luban.Core.Services.Analyses
         {
             await base.OnServiceInitialized();
             Log.Information($"OnServiceInitialized");
-            Setting = Container.Resolve<ISettingService>();
-
             await Task.CompletedTask;
         }
 

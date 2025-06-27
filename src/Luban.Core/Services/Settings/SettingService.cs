@@ -17,8 +17,6 @@ namespace Luban.Core.Services.Settings
 {
     internal class SettingService : ISettingService
     {
-        private ILog Log { get; set; }
-
         public string SettingPath { get; private set; }
 
         public ICustomSetting<MainSetting> MainSetting { get; private set; }
@@ -70,7 +68,7 @@ namespace Luban.Core.Services.Settings
 
         public override async Task OnServiceInitialized()
         {
-            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = "设置服务" }]);
+            await base.OnServiceInitialized();
             Log.Information($"OnServiceInitialized");
             Log.Information($"\nAppFolder : {Utils.AppFolder}\nAppDataFolder : {Utils.AppDataFolder}");
 
