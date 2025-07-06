@@ -42,8 +42,11 @@ namespace Luban.Core.Services.Settings
             if (injectTarget != null && injectTarget.Target != null)
             {
                 var settingRoot = injectTarget.Target.GetType().GetCustomAttribute<CustomSettingRootAttribute>(true);
-                var rootSubPath = settingRoot.GetNextSubPath(injectTarget.Target);
-                settingPath = Path.Combine(settingPath, rootSubPath).StandardizedPath();
+                if (settingRoot != null)
+                {
+                    var rootSubPath = settingRoot.GetNextSubPath(injectTarget.Target);
+                    settingPath = Path.Combine(settingPath, rootSubPath).StandardizedPath();
+                }
             }
 
             if (!string.IsNullOrEmpty(settingInfo.RelativePath))
