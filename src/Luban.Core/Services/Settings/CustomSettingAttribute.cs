@@ -12,7 +12,7 @@ namespace Luban.Core.Services.Settings
 
         public bool IsAppFolder { get; set; }
 
-        public string RelativePath => string.IsNullOrEmpty(SubPath) ? Name : Path.Combine(SubPath, Name).StandardizedPath();
+        public string RelativePath => string.IsNullOrEmpty(SubPath) ? Name : Utils.PathCombine(SubPath, Name);
 
         public CustomSettingAttribute(string name)
         {

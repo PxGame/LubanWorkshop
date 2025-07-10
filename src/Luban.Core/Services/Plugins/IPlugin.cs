@@ -33,14 +33,14 @@ namespace Luban.Core.Services.Plugins
 
         protected virtual string GetCustomSettingNextSubPath()
         {
-            return Path.Combine("Plugins", Config.Name).StandardizedPath();
+            return Utils.PathCombine("Plugins", Config.Name);
         }
 
         protected virtual Dictionary<string, object> GetLogPropertyDict()
         {
             var result = new Dictionary<string, object>();
             //var datetime = DateTime.Now.ToString("yyyyMMddHHmmss");
-            result["RelativeFilePath"] = Path.Combine("Plugins", Config.Name, $"plugin_.log");
+            result["RelativeFilePath"] = Utils.PathCombine("Plugins", Config.Name, $"plugin_.log");
             result["LogTag"] = Config.Name;
             return result;
         }

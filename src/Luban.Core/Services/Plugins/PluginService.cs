@@ -60,7 +60,7 @@ namespace Luban.Core.Services.Plugins
         private async Task LoadAll()
         {
             await LoadAllFromFolder(Utils.AppPluginsFolder);
-            await LoadAllFromFolder(Utils.AppDataPluginsFolder);
+            await LoadAllFromFolder(Utils.UserPluginsFolder);
         }
 
         private async Task LoadAllFromFolder(string pluginsFolder)

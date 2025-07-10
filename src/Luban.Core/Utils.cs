@@ -7,26 +7,34 @@ namespace Luban.Core
     {
         public static string AppName => "Luban";
         public static string AppFolder { get; }
-        public static string AppDataFolder { get; }
+        public static string UserFolder { get; }
         public static string AppLogFolder { get; }
         public static string AppPluginsFolder { get; }
-        public static string AppDataPluginsFolder { get; }
-        public static string AppDataSettingsFolder { get; }
+        public static string UserPluginsFolder { get; }
+
+        public static string AppSettingsFolder { get; }
+        public static string UserSettingsFolder { get; }
 
         static Utils()
         {
             AppFolder = AppContext.BaseDirectory.StandardizedPath();
-            AppDataFolder =
-                Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                AppName).StandardizedPath();
+            UserFolder =
+                PathCombine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                    AppName);
 
-            AppLogFolder = Path.Combine(AppDataFolder, "Logs").StandardizedPath();
+            AppLogFolder = PathCombine(UserFolder, "Logs");
 
-            AppPluginsFolder = Path.Combine(AppFolder, "Plugins").StandardizedPath();
-            AppDataPluginsFolder = Path.Combine(AppDataFolder, "Plugins").StandardizedPath();
+            AppPluginsFolder = PathCombine(AppFolder, "Plugins");
+            UserPluginsFolder = PathCombine(UserFolder, "Plugins");
 
-            AppDataSettingsFolder = Path.Combine(AppDataFolder, "Settings").StandardizedPath();
+            AppSettingsFolder = PathCombine(AppFolder, "Settings");
+            UserSettingsFolder = PathCombine(UserFolder, "Settings");
+        }
+
+        public static string PathCombine(params string[] paths)
+        {
+            return Path.Combine(paths).StandardizedPath();
         }
 
         public static string StandardizedPath(this string path)

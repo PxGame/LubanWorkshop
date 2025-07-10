@@ -31,7 +31,7 @@ namespace Luban.Core.Services.Plugins
 
             _pluginConfig = pluginConfig;
 
-            _mainAssemblyPath = Path.Combine(_pluginFolder, _pluginConfig.EntryName + ".dll");
+            _mainAssemblyPath = Utils.PathCombine(_pluginFolder, _pluginConfig.EntryName + ".dll");
             _dependencyResolver = new AssemblyDependencyResolver(_mainAssemblyPath);
         }
 

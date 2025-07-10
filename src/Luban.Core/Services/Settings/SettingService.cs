@@ -2,19 +2,42 @@
 using Luban.Core.Services.Logs;
 using Luban.Core.Services.Plugins;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Luban.Core.Services.Settings
 {
+    public enum SettingType
+    {
+        Main,
+        LocalUser,
+        MainRemote,
+    }
+
+    public interface ISetting
+    {
+        SettingType settingType { get; }
+    }
+
+    internal class Setting : ISetting
+    {
+        public SettingType settingType { get; }
+
+        public Setting(ISettingService setting, string rootRelativePath, string fileRelativePath, SettingType settingType)
+        {
+            this.settingType = settingType;
+        }
+    }
+
     internal class SettingService : ISettingService
     {
         public string SettingPath { get; private set; }
@@ -45,13 +68,13 @@ namespace Luban.Core.Services.Settings
                 if (settingRoot != null)
                 {
                     var rootSubPath = settingRoot.GetNextSubPath(injectTarget.Target);
-                    settingPath = Path.Combine(settingPath, rootSubPath).StandardizedPath();
+                    settingPath = Utils.PathCombine(settingPath, rootSubPath);
                 }
             }
 
             if (!string.IsNullOrEmpty(settingInfo.RelativePath))
             {
-                settingPath = Path.Combine(settingPath, settingInfo.RelativePath).StandardizedPath();
+                settingPath = Utils.PathCombine(settingPath, settingInfo.RelativePath);
             }
 
             var settingType = type.GetGenericArguments()[0];
@@ -73,7 +96,7 @@ namespace Luban.Core.Services.Settings
         {
             await base.OnServiceInitialized();
             Log.Information($"OnServiceInitialized");
-            Log.Information($"\nAppFolder : {Utils.AppFolder}\nAppDataFolder : {Utils.AppDataFolder}");
+            Log.Information($"\nAppFolder : {Utils.AppFolder}\nAppDataFolder : {Utils.UserFolder}");
 
             await Task.CompletedTask;
         }
@@ -89,43 +112,89 @@ namespace Luban.Core.Services.Settings
 
         protected string GetFullPath(string relativeFilePath, bool isAppFolder)
         {
-            var fullPath = Path.Combine(isAppFolder ? Utils.AppFolder : Utils.AppDataSettingsFolder, relativeFilePath).StandardizedPath();
+            var fullPath = Utils.PathCombine(isAppFolder ? Utils.AppFolder : Utils.UserSettingsFolder, relativeFilePath);
             return fullPath;
         }
 
-        public override T Load<T>(string relativeFilePath, bool isAppFolder)
+        public override ISetting Load(string rootRelativePath, string subFilePath, SettingType settingType)
         {
-            var fullPath = GetFullPath(relativeFilePath, isAppFolder);
-            try
+            string data = string.Empty;
+            switch (settingType)
             {
-                var jsonData = File.ReadAllText(fullPath);
-                return JsonConvert.DeserializeObject<T>(jsonData);
+                case SettingType.Main:
+                    data = LoadMain(rootRelativePath, subFilePath);
+                    break;
+
+                case SettingType.LocalUser:
+                    data = LoadLocalUser(rootRelativePath, subFilePath);
+                    break;
+
+                case SettingType.MainRemote:
+                    data = LoadMainRemote(rootRelativePath, subFilePath);
+                    break;
+
+                default:
+                    throw new ArgumentException($"Unsupported setting type: {settingType}");
             }
-            catch (Exception)
+
+            var jsonNode = JObject.Parse(data);
+            throw new ArgumentException($"Unsupported setting type");
+        }
+
+        public override void Save(ISetting setting)
+        {
+            switch (setting.settingType)
             {
-                return Activator.CreateInstance<T>();
+                case SettingType.Main:
+                    SaveMain(setting);
+                    break;
+
+                case SettingType.LocalUser:
+                    SaveLocalUser(setting);
+                    break;
+
+                case SettingType.MainRemote:
+                    SaveMainRemote(setting);
+                    break;
+
+                default:
+                    throw new ArgumentException($"Unsupported setting type: {setting.settingType}");
             }
         }
 
-        public override void Save<T>(string relativeFilePath, T data, bool isAppFolder)
+        private void SaveMainRemote(ISetting setting)
         {
-            var fullPath = GetFullPath(relativeFilePath, isAppFolder);
-            try
-            {
-                var folder = Path.GetDirectoryName(fullPath);
-                if (!Directory.Exists(folder))
-                {
-                    Directory.CreateDirectory(folder);
-                }
+            throw new NotImplementedException();
+        }
 
-                var jsonData = JsonConvert.SerializeObject(data, Formatting.Indented);
-                File.WriteAllText(fullPath, jsonData);
-                Log.Information($"配置文件已保存: {fullPath}");
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"配置文件保存失败: {fullPath}");
-            }
+        private void SaveLocalUser(ISetting setting)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void SaveMain(ISetting setting)
+        {
+            throw new NotImplementedException();
+        }
+
+        private string LoadMainRemote(string rootRelativePath, string subFilePath)
+        {
+            throw new NotImplementedException();
+        }
+
+        private string LoadLocalUser(string rootRelativePath, string subFilePath)
+        {
+            var fullPath = Utils.PathCombine(Utils.UserSettingsFolder, rootRelativePath, subFilePath);
+            throw new NotImplementedException();
+        }
+
+        private string LoadMain(string rootRelativePath, string subFilePath)
+        {
+            var fullPath = Utils.PathCombine(Utils.AppSettingsFolder, rootRelativePath, subFilePath);
+
+            using var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+            throw new NotImplementedException();
         }
     }
 }

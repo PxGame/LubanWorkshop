@@ -1,7 +1,9 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using System.Threading.Tasks;
 using Luban.Core;
 using Luban.Core.Containers;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Threading.Tasks;
 
 internal class Program
 {
@@ -43,11 +45,29 @@ internal class Program
 
     private static async Task Main(string[] args)
     {
-        AppEntry entry = new AppEntry();
+        //AppEntry entry = new AppEntry();
 
-        await entry.Initialize();
-        await entry.Shutdown();
+        //await entry.Initialize();
+        //await entry.Shutdown();
 
-        entry.Dispose();
+        //entry.Dispose();
+
+        JObject obj = new JObject();
+
+        obj["a"] = "hello";
+        obj["b"] = 1111;
+        obj["c"] = new JObject
+        {
+            ["d"] = "test",
+            ["e"] = 123
+        };
+
+        var str = obj.ToString();
+        Console.WriteLine(str);
+
+        var obj2 = JObject.Parse(str);
+        obj2["a"] = "xxxx";
+
+        Console.WriteLine(obj2["c.d"]);
     }
 }

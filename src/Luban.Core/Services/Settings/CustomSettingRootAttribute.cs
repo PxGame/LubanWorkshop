@@ -19,7 +19,7 @@ namespace Luban.Core.Services.Settings
                 var nextSubPathMethod = target.GetType().GetMethod(GetNextSubPathMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 if (nextSubPathMethod == null) { throw new ContainerException($"未找到方法: {GetNextSubPathMethodName} 在 {target.GetType().FullName}"); }
                 var nextSubPath = nextSubPathMethod.Invoke(target, null) as string ?? string.Empty;
-                result = Path.Combine(result, nextSubPath).StandardizedPath();
+                result = Utils.PathCombine(result, nextSubPath);
             }
 
             return result;

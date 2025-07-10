@@ -78,12 +78,12 @@ namespace Luban.Core.Services.Logs
                     t.Console(outputConsoleTemplate);
                     t.Map("RelativeFilePath", (relativeFilePath, lc) =>
                     {
-                        var filePath = Path.Combine(Utils.AppLogFolder, relativeFilePath).StandardizedPath();
+                        var filePath = Utils.PathCombine(Utils.AppLogFolder, relativeFilePath);
                         lc.File(outputFileTemplate, filePath, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
                     });
                     t.Logger(lc =>
                     {
-                        var filePath = Path.Combine(Utils.AppLogFolder, $"main_.log").StandardizedPath();
+                        var filePath = Utils.PathCombine(Utils.AppLogFolder, $"main_.log");
                         lc.Filter.ByExcluding(t => t.Properties.ContainsKey("RelativeFilePath"))
                             .WriteTo.File(outputFileTemplate, filePath, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
                     });

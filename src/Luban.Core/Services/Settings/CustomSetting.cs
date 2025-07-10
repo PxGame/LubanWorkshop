@@ -30,13 +30,13 @@ namespace Luban.Core.Services.Settings
 
         public virtual void Reload()
         {
-            Data = Setting.Load<T>(RelativeFilePath, IsAppFolder);
+            //Data = Setting.Load<T>(RelativeFilePath, IsAppFolder);
             OnReload?.Invoke();
         }
 
         public virtual void Save()
         {
-            Setting.Save<T>(RelativeFilePath, Data, IsAppFolder);
+            //Setting.Save<T>(RelativeFilePath, Data, IsAppFolder);
             OnSaved?.Invoke();
         }
     }

@@ -38,7 +38,7 @@ namespace Luban.Core.Services.Plugins
 
         public async Task Initialize()
         {
-            var configPath = Path.Combine(_folder, ConfigFileName);
+            var configPath = Utils.PathCombine(_folder, ConfigFileName);
             if (!File.Exists(configPath)) { throw null; }
             var configJsonStr = File.ReadAllText(configPath);
             _config = JsonConvert.DeserializeObject<PluginConfig>(configJsonStr);
