@@ -14,8 +14,10 @@ namespace Luban.Core.Services.Plugins
     internal class PluginLoadContext : AssemblyLoadContext
     {
         private readonly AssemblyLoadContext _defaultLoadContext;
-        private readonly string _appFolder;
+
+        //private readonly string _appFolder;
         private readonly string _pluginFolder;
+
         private readonly PluginConfig _pluginConfig;
         private readonly string _mainAssemblyPath;
         private readonly AssemblyDependencyResolver _dependencyResolver;
@@ -28,7 +30,6 @@ namespace Luban.Core.Services.Plugins
             _defaultLoadContext = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly()) ?? AssemblyLoadContext.Default;
 
             _pluginFolder = pluginFolder;
-
             _pluginConfig = pluginConfig;
 
             _mainAssemblyPath = Utils.PathCombine(_pluginFolder, _pluginConfig.EntryName + ".dll");

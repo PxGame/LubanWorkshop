@@ -1,6 +1,7 @@
 ﻿using Luban.Core.Containers;
 using Luban.Core.Services.Logs;
 using Luban.Core.Services.Plugins;
+using Luban.Core.Services.Storages;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -16,70 +17,99 @@ using System.Threading.Tasks;
 
 namespace Luban.Core.Services.Settings
 {
-    public enum SettingType
+    public class SettingAttribute : Attribute
     {
-        Main,
-        LocalUser,
-        MainRemote,
+        public FileStorageType StorageType { get; }
+        public string RelativePath { get; }
+
+        public SettingAttribute(FileStorageType storageType, string relativePath)
+        {
+            StorageType = storageType;
+            RelativePath = relativePath;
+        }
     }
 
     public interface ISetting
     {
-        SettingType settingType { get; }
+        void Set<T>(string key, T value);
+
+        bool TryGetValue<T>(string key, out T value);
+
+        void Load();
+
+        void Save();
     }
 
     internal class Setting : ISetting
     {
-        public SettingType settingType { get; }
+        public ISettingService service { get; }
+        public FileStorageType storageType { get; }
+        public string relativePath { get; }
 
-        public Setting(ISettingService setting, string rootRelativePath, string fileRelativePath, SettingType settingType)
+        private JObject _rawData;
+
+        public Setting(ISettingService service, FileStorageType storageType, string relativePath)
         {
-            this.settingType = settingType;
+            this.service = service;
+            this.storageType = storageType;
+            this.relativePath = relativePath;
+        }
+
+        public void Load()
+        {
+            _rawData = service.Load(storageType, relativePath);
+        }
+
+        public void Save()
+        {
+            service.Save(storageType, relativePath, _rawData);
+        }
+
+        public void Set<T>(string key, T value)
+        {
+            _rawData[key] = JToken.FromObject(value);
+        }
+
+        public bool TryGetValue<T>(string key, out T value)
+        {
+            if (_rawData.TryGetValue(key, out JToken token))
+            {
+                value = token.ToObject<T>();
+                return true;
+            }
+            else
+            {
+                value = default;
+                return false;
+            }
         }
     }
 
     internal class SettingService : ISettingService
     {
-        public string SettingPath { get; private set; }
+        private IStorageService storage { get; set; }
 
-        public ICustomSetting<MainSetting> MainSetting { get; private set; }
+        public ISetting MainSetting { get; private set; }
 
-        public ICustomSetting<UserSetting> UserSetting { get; private set; }
+        public ISetting UserSetting { get; private set; }
 
         public override void OnResolved()
         {
-            Container.RegisterType(typeof(ICustomSetting<>), OnCreateSetting, false, null, false);
-
-            MainSetting = Container.Resolve<ICustomSetting<MainSetting>>([new CustomSettingAttribute("setting.json") { IsAppFolder = true }]);
-            UserSetting = Container.Resolve<ICustomSetting<UserSetting>>([new CustomSettingAttribute("setting.json") { }]);
+            Container.RegisterType(typeof(ISetting), OnCreateSetting, false, null, false);
         }
 
         private object OnCreateSetting(IRegistration regist, Type type, List<object> extraInfos, object[] args)
         {
-            CustomSettingAttribute settingInfo = extraInfos.FirstOrDefault(x => x is CustomSettingAttribute) as CustomSettingAttribute;
+            SettingAttribute settingInfo = extraInfos.FirstOrDefault(x => x is SettingAttribute) as SettingAttribute;
 
-            if (settingInfo == null || !type.IsGenericType || type.GetGenericTypeDefinition() != typeof(ICustomSetting<>)) { return null; }
+            if (settingInfo == null) { return null; }
 
-            var injectTarget = extraInfos.FirstOrDefault(x => x is InjectTarget) as InjectTarget;
-            var settingPath = string.Empty;
-            if (injectTarget != null && injectTarget.Target != null)
-            {
-                var settingRoot = injectTarget.Target.GetType().GetCustomAttribute<CustomSettingRootAttribute>(true);
-                if (settingRoot != null)
-                {
-                    var rootSubPath = settingRoot.GetNextSubPath(injectTarget.Target);
-                    settingPath = Utils.PathCombine(settingPath, rootSubPath);
-                }
-            }
+            //var injectTarget = extraInfos.FirstOrDefault(x => x is InjectTarget) as InjectTarget;
 
-            if (!string.IsNullOrEmpty(settingInfo.RelativePath))
-            {
-                settingPath = Utils.PathCombine(settingPath, settingInfo.RelativePath);
-            }
+            var setting = new Setting(this, settingInfo.StorageType, settingInfo.RelativePath);
+            setting.Load();
 
-            var settingType = type.GetGenericArguments()[0];
-            var settingInstance = Activator.CreateInstance(typeof(CustomSetting<>).MakeGenericType(settingType), this, settingPath, settingInfo.IsAppFolder);
-            return settingInstance;
+            return setting;
         }
 
         public override void OnInstanceReleased()
@@ -89,6 +119,8 @@ namespace Luban.Core.Services.Settings
 
         public override async Task OnServiceInitialing()
         {
+            storage = Container.Resolve<IStorageService>();
+
             await Task.CompletedTask;
         }
 
@@ -97,6 +129,9 @@ namespace Luban.Core.Services.Settings
             await base.OnServiceInitialized();
             Log.Information($"OnServiceInitialized");
             Log.Information($"\nAppFolder : {Utils.AppFolder}\nAppDataFolder : {Utils.UserFolder}");
+
+            MainSetting = Container.Resolve<ISetting>([new SettingAttribute(FileStorageType.AppFolder, "setting.json")]);
+            UserSetting = Container.Resolve<ISetting>([new SettingAttribute(FileStorageType.UserFolder, "setting.json")]);
 
             await Task.CompletedTask;
         }
@@ -110,91 +145,18 @@ namespace Luban.Core.Services.Settings
             await Task.CompletedTask;
         }
 
-        protected string GetFullPath(string relativeFilePath, bool isAppFolder)
+        public override JObject Load(FileStorageType storageType, string relativePath)
         {
-            var fullPath = Utils.PathCombine(isAppFolder ? Utils.AppFolder : Utils.UserSettingsFolder, relativeFilePath);
-            return fullPath;
+            var jsonStr = storage.ReadFileText(storageType, relativePath);
+            if (string.IsNullOrEmpty(jsonStr)) { return new JObject(); }
+            var jsonObj = JObject.Parse(jsonStr);
+            return jsonObj;
         }
 
-        public override ISetting Load(string rootRelativePath, string subFilePath, SettingType settingType)
+        public override void Save(FileStorageType storageType, string relativePath, JObject setting)
         {
-            string data = string.Empty;
-            switch (settingType)
-            {
-                case SettingType.Main:
-                    data = LoadMain(rootRelativePath, subFilePath);
-                    break;
-
-                case SettingType.LocalUser:
-                    data = LoadLocalUser(rootRelativePath, subFilePath);
-                    break;
-
-                case SettingType.MainRemote:
-                    data = LoadMainRemote(rootRelativePath, subFilePath);
-                    break;
-
-                default:
-                    throw new ArgumentException($"Unsupported setting type: {settingType}");
-            }
-
-            var jsonNode = JObject.Parse(data);
-            throw new ArgumentException($"Unsupported setting type");
-        }
-
-        public override void Save(ISetting setting)
-        {
-            switch (setting.settingType)
-            {
-                case SettingType.Main:
-                    SaveMain(setting);
-                    break;
-
-                case SettingType.LocalUser:
-                    SaveLocalUser(setting);
-                    break;
-
-                case SettingType.MainRemote:
-                    SaveMainRemote(setting);
-                    break;
-
-                default:
-                    throw new ArgumentException($"Unsupported setting type: {setting.settingType}");
-            }
-        }
-
-        private void SaveMainRemote(ISetting setting)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void SaveLocalUser(ISetting setting)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void SaveMain(ISetting setting)
-        {
-            throw new NotImplementedException();
-        }
-
-        private string LoadMainRemote(string rootRelativePath, string subFilePath)
-        {
-            throw new NotImplementedException();
-        }
-
-        private string LoadLocalUser(string rootRelativePath, string subFilePath)
-        {
-            var fullPath = Utils.PathCombine(Utils.UserSettingsFolder, rootRelativePath, subFilePath);
-            throw new NotImplementedException();
-        }
-
-        private string LoadMain(string rootRelativePath, string subFilePath)
-        {
-            var fullPath = Utils.PathCombine(Utils.AppSettingsFolder, rootRelativePath, subFilePath);
-
-            using var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-            throw new NotImplementedException();
+            var jsonStr = setting.ToString(Formatting.Indented);
+            storage.WriteFileText(storageType, relativePath, jsonStr);
         }
     }
 }

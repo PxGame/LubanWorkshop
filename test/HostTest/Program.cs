@@ -45,29 +45,31 @@ internal class Program
 
     private static async Task Main(string[] args)
     {
-        //AppEntry entry = new AppEntry();
+        AppEntry entry = new AppEntry();
 
-        //await entry.Initialize();
-        //await entry.Shutdown();
+        await entry.Initialize();
+        await entry.Shutdown();
 
-        //entry.Dispose();
+        entry.Dispose();
 
-        JObject obj = new JObject();
+        //JObject obj = new JObject();
 
-        obj["a"] = "hello";
-        obj["b"] = 1111;
-        obj["c"] = new JObject
-        {
-            ["d"] = "test",
-            ["e"] = 123
-        };
+        //obj["a"] = "hello";
+        //obj["b"] = 1111;
+        //obj["c"] = new JObject
+        //{
+        //    ["d"] = "test",
+        //    ["e"] = 123
+        //};
 
-        var str = obj.ToString();
-        Console.WriteLine(str);
+        //var str = obj.ToString();
+        //Console.WriteLine(str);
 
-        var obj2 = JObject.Parse(str);
-        obj2["a"] = "xxxx";
+        //var obj2 = JObject.Parse(str);
+        //obj2["a"] = "xxxx";
 
-        Console.WriteLine(obj2["c.d"]);
+        //Console.WriteLine(obj2["c.d"]);
+
+        await Task.CompletedTask;
     }
 }

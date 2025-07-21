@@ -42,6 +42,9 @@ namespace Luban.Core.Services.Plugins
 
         public override async Task OnServiceInitialing()
         {
+            Setting = Container.Resolve<ISettingService>();
+            Analysis = Container.Resolve<IAnalysisService>();
+
             await Task.CompletedTask;
         }
 
@@ -49,9 +52,6 @@ namespace Luban.Core.Services.Plugins
         {
             await base.OnServiceInitialized();
             Log.Information($"OnServiceInitialized");
-
-            Setting = Container.Resolve<ISettingService>();
-            Analysis = Container.Resolve<IAnalysisService>();
 
             await LoadAll();
             await Task.CompletedTask;

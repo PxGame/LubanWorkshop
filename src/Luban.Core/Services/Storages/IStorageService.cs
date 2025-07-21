@@ -9,5 +9,8 @@ namespace Luban.Core.Services.Storages
 {
     public abstract class IStorageService : IService
     {
+        public abstract void WriteFileText(FileStorageType storageType, string relativeFilePath, string content);
+
+        public abstract string ReadFileText(FileStorageType storageType, string relativeFilePath);
     }
 }

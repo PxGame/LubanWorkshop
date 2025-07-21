@@ -44,37 +44,41 @@ namespace Luban.Core.Services.Storages
             await Task.CompletedTask;
         }
 
-        public string ReadFileText(string relativeFilePath, FileStorageType storageType)
+        public override string ReadFileText(FileStorageType storageType, string relativeFilePath)
         {
-            switch (storageType)
+            try
             {
-                case FileStorageType.AppFolder:
-                    {
-                        var fullPath = Utils.PathCombine(Utils.AppFolder, relativeFilePath);
-                        if (!File.Exists(fullPath)) { throw new FileNotFoundException($"File not found: {fullPath}"); }
-                        return File.ReadAllText(fullPath);
-                    }
-                    break;
+                switch (storageType)
+                {
+                    case FileStorageType.AppFolder:
+                        {
+                            var fullPath = Utils.PathCombine(Utils.AppFolder, relativeFilePath);
+                            if (!File.Exists(fullPath)) { throw new FileNotFoundException($"File not found: {fullPath}"); }
+                            return File.ReadAllText(fullPath);
+                        }
 
-                case FileStorageType.UserFolder:
-                    {
-                        var fullPath = Utils.PathCombine(Utils.UserFolder, relativeFilePath);
-                        if (!File.Exists(fullPath)) { throw new FileNotFoundException($"File not found: {fullPath}"); }
-                        return File.ReadAllText(fullPath);
-                    }
-                    break;
+                    case FileStorageType.UserFolder:
+                        {
+                            var fullPath = Utils.PathCombine(Utils.UserFolder, relativeFilePath);
+                            if (!File.Exists(fullPath)) { throw new FileNotFoundException($"File not found: {fullPath}"); }
+                            return File.ReadAllText(fullPath);
+                        }
 
-                case FileStorageType.RemoteFolder:
-                    // Remote storage handling is not implemented in this example.
-                    throw new NotImplementedException("Remote storage handling is not implemented yet.");
-                    break;
+                    case FileStorageType.RemoteFolder:
+                        // Remote storage handling is not implemented in this example.
+                        throw new NotImplementedException("Remote storage handling is not implemented yet.");
 
-                default:
-                    throw new NotSupportedException($"Unsupported storage type: {storageType}");
+                    default:
+                        throw new NotSupportedException($"Unsupported storage type: {storageType}");
+                }
+            }
+            catch (Exception)
+            {
+                return string.Empty; // Return empty string if an error occurs, could also log the error.
             }
         }
 
-        public void WriteFileText(string relativeFilePath, string content, FileStorageType storageType)
+        public override void WriteFileText(FileStorageType storageType, string relativeFilePath, string content)
         {
             switch (storageType)
             {
@@ -95,7 +99,6 @@ namespace Luban.Core.Services.Storages
                 case FileStorageType.RemoteFolder:
                     // Remote storage handling is not implemented in this example.
                     throw new NotImplementedException("Remote storage handling is not implemented yet.");
-                    break;
 
                 default:
                     throw new NotSupportedException($"Unsupported storage type: {storageType}");

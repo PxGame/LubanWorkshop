@@ -19,7 +19,6 @@ namespace Luban.Core.Services.Plugins
     }
 
     [LogRoot(GetLogPropertyDictMethodName = nameof(GetLogPropertyDict))]
-    [CustomSettingRoot(GetNextSubPathMethodName = nameof(GetCustomSettingNextSubPath))]
     public abstract class IPlugin<T> : IPlugin where T : class
     {
         [Inject] public IServiceCollection services { get; init; }
@@ -28,13 +27,13 @@ namespace Luban.Core.Services.Plugins
 
         [Inject] public ILog Log { get; init; }
 
-        [CustomSetting("setting.json")]
-        [Inject] public ICustomSetting<T> UserSetting { get; init; }
+        [Setting(Storages.FileStorageType.UserFolder, "setting.json")]
+        [Inject] public ISetting UserSetting { get; init; }
 
-        protected virtual string GetCustomSettingNextSubPath()
-        {
-            return Utils.PathCombine("Plugins", Config.Name);
-        }
+        //protected virtual string GetCustomSettingNextSubPath()
+        //{
+        //    return Utils.PathCombine("Plugins", Config.Name);
+        //}
 
         protected virtual Dictionary<string, object> GetLogPropertyDict()
         {

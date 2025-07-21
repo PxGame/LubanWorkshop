@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Luban.Core.Services.Analyses
 {
@@ -27,6 +26,7 @@ namespace Luban.Core.Services.Analyses
 
         public override async Task OnServiceInitialing()
         {
+            Setting = Container.Resolve<ISettingService>();
             await Task.CompletedTask;
         }
 
@@ -34,7 +34,6 @@ namespace Luban.Core.Services.Analyses
         {
             await base.OnServiceInitialized();
             Log.Information($"OnServiceInitialized");
-            Setting = Container.Resolve<ISettingService>();
 
             await Task.CompletedTask;
         }
