@@ -8,12 +8,7 @@ using System.Threading.Tasks;
 
 namespace PluginTest
 {
-    public class PluginUserSetting
-    {
-        public string Name { get; set; } = "PluginTest";
-    }
-
-    public class PluginEntry : IPlugin<PluginUserSetting>
+    public class PluginEntry : IPlugin
     {
         public override void OnResolved()
         {

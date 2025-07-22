@@ -7,35 +7,25 @@ using System.Threading.Tasks;
 
 namespace Luban.Core.Services.Plugins
 {
-    public interface IPlugin : IOnResolved
-    {
-        IPluginConfig Config { get; init; }
-        ILog Log { get; init; }
-        string RootFolder { get; init; }
-
-        Task OnLoad();
-
-        Task OnUnload();
-    }
-
-    [LogRoot(GetLogPropertyDictMethodName = nameof(GetLogPropertyDict))]
-    public abstract class IPlugin<T> : IPlugin where T : class
+    public abstract class IPlugin : IOnResolved
     {
         [Inject] public IServiceCollection services { get; init; }
         [Inject] public string RootFolder { get; init; }
+
         [Inject] public IPluginConfig Config { get; init; }
 
+        [Log(Tag = "Plugin", CustomPropertyMethodName = nameof(GetLogCustomProperty))]
         [Inject] public ILog Log { get; init; }
 
-        [Setting(Storages.FileStorageType.UserFolder, "setting.json")]
+        [Setting(Storages.FileStorageType.UserFolder, "setting.json", RelativeRootPathMethodName = nameof(GetSettingRelativeRootPath))]
         [Inject] public ISetting UserSetting { get; init; }
 
-        //protected virtual string GetCustomSettingNextSubPath()
-        //{
-        //    return Utils.PathCombine("Plugins", Config.Name);
-        //}
+        protected virtual string GetSettingRelativeRootPath()
+        {
+            return Utils.PathCombine("Plugins", Config.Name);
+        }
 
-        protected virtual Dictionary<string, object> GetLogPropertyDict()
+        protected virtual Dictionary<string, object> GetLogCustomProperty()
         {
             var result = new Dictionary<string, object>();
             //var datetime = DateTime.Now.ToString("yyyyMMddHHmmss");

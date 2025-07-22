@@ -25,18 +25,17 @@ namespace Luban.Core.Services.Logs
             var dict = new Dictionary<string, object>();
 
             var logAttr = extraInfos?.FirstOrDefault(x => x is LogAttribute) as LogAttribute;
-            if (logAttr != null && !string.IsNullOrEmpty(logAttr.Tag))
+            if (logAttr != null)
             {
-                dict["LogTag"] = logAttr.Tag;
-            }
-
-            var injectTarget = extraInfos.FirstOrDefault(x => x is InjectTarget) as InjectTarget;
-            if (injectTarget != null && injectTarget.Target != null)
-            {
-                var logRootAttr = injectTarget.Target.GetType().GetCustomAttribute<LogRootAttribute>(true);
-                if (logRootAttr != null)
+                if (!string.IsNullOrEmpty(logAttr.Tag))
                 {
-                    var propertyDict = logRootAttr.GetLogPropertyDict(injectTarget.Target);
+                    dict["LogTag"] = logAttr.Tag;
+                }
+
+                var injectTarget = extraInfos.FirstOrDefault(x => x is InjectTarget) as InjectTarget;
+                if (injectTarget != null && injectTarget.Target != null)
+                {
+                    var propertyDict = logAttr.GetCustomProperty(injectTarget.Target);
                     if (propertyDict != null && propertyDict.Count > 0)
                     {
                         foreach (var kvp in propertyDict)

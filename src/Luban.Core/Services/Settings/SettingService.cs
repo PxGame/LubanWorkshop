@@ -17,10 +17,12 @@ using System.Threading.Tasks;
 
 namespace Luban.Core.Services.Settings
 {
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class SettingAttribute : Attribute
     {
         public FileStorageType StorageType { get; }
         public string RelativePath { get; }
+        public string RelativeRootPathMethodName { get; set; }
 
         public SettingAttribute(FileStorageType storageType, string relativePath)
         {
@@ -47,6 +49,7 @@ namespace Luban.Core.Services.Settings
         public string relativePath { get; }
 
         private JObject _rawData;
+        private bool isDirty;
 
         public Setting(ISettingService service, FileStorageType storageType, string relativePath)
         {
@@ -58,10 +61,15 @@ namespace Luban.Core.Services.Settings
         public void Load()
         {
             _rawData = service.Load(storageType, relativePath);
+            _rawData.PropertyChanged += (sender, e) =>
+            {
+                isDirty = true;
+            };
         }
 
         public void Save()
         {
+            if (!isDirty) { return; }
             service.Save(storageType, relativePath, _rawData);
         }
 
