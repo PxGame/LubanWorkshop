@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PluginTest
 {
-    public class PluginEntry : IPlugin
+    public class PluginEntry : IPluginEntry
     {
         public override void OnResolved()
         {

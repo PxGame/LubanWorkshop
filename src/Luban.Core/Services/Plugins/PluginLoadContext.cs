@@ -41,7 +41,7 @@ namespace Luban.Core.Services.Plugins
             var mainAssembly = LoadAssemblyFromFilePath(_mainAssemblyPath);
 
             var pluginType = mainAssembly.GetTypes()
-                .FirstOrDefault(t => t.IsClass && typeof(IPlugin).IsAssignableFrom(t), null);
+                .FirstOrDefault(t => t.IsClass && typeof(IPluginEntry).IsAssignableFrom(t), null);
 
             return pluginType;
         }

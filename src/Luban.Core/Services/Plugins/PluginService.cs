@@ -27,7 +27,7 @@ namespace Luban.Core.Services.Plugins
         public override void OnResolved()
         {
             Container.RegisterType<PluginController>();
-            Container.RegisterType(typeof(IPlugin), OnCreatePlugin, false, null, true);
+            Container.RegisterType(typeof(IPluginEntry), OnCreatePlugin, false, null, true);
         }
 
         private object OnCreatePlugin(IRegistration regist, Type type, List<object> extraInfos, object[] args)

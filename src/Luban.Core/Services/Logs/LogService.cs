@@ -11,6 +11,12 @@ using System.Threading.Tasks;
 
 namespace Luban.Core.Services.Logs
 {
+    public static class LogParams
+    {
+        public const string RelativeFilePath = "RelativeFilePath";
+        public const string LogTag = "LogTag";
+    }
+
     internal class LogService : ILogService
     {
         private ILogger _rootLogger;
@@ -29,7 +35,7 @@ namespace Luban.Core.Services.Logs
             {
                 if (!string.IsNullOrEmpty(logAttr.Tag))
                 {
-                    dict["LogTag"] = logAttr.Tag;
+                    dict[LogParams.LogTag] = logAttr.Tag;
                 }
 
                 var injectTarget = extraInfos.FirstOrDefault(x => x is InjectTarget) as InjectTarget;
@@ -59,7 +65,7 @@ namespace Luban.Core.Services.Logs
         {
             var logFormat = "[{@t:yyyy-MM-dd HH:mm:ss.fff}]" +
                 "[{@l:u3}]" +
-                "{#if LogTag is not null}[{LogTag}]{#end}" +
+                "{#if " + LogParams.LogTag + " is not null}[{" + LogParams.LogTag + "}]{#end}" +
                 "{@m:lj}\n" +
                 "{#if @x is not null}{@x}\n{#end}";
 
@@ -75,7 +81,7 @@ namespace Luban.Core.Services.Logs
                 .WriteTo.Async(t =>
                 {
                     t.Console(outputConsoleTemplate);
-                    t.Map("RelativeFilePath", (relativeFilePath, lc) =>
+                    t.Map(LogParams.RelativeFilePath, (relativeFilePath, lc) =>
                     {
                         var filePath = Utils.PathCombine(Utils.AppLogFolder, relativeFilePath);
                         lc.File(outputFileTemplate, filePath, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
@@ -83,7 +89,7 @@ namespace Luban.Core.Services.Logs
                     t.Logger(lc =>
                     {
                         var filePath = Utils.PathCombine(Utils.AppLogFolder, $"main_.log");
-                        lc.Filter.ByExcluding(t => t.Properties.ContainsKey("RelativeFilePath"))
+                        lc.Filter.ByExcluding(t => t.Properties.ContainsKey(LogParams.RelativeFilePath))
                             .WriteTo.File(outputFileTemplate, filePath, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
                     });
                 })

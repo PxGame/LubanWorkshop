@@ -7,7 +7,14 @@ using System.Threading.Tasks;
 
 namespace Luban.Core.Services.Plugins
 {
-    public abstract class IPlugin : IOnResolved
+    internal interface IPlugin : IOnResolved
+    {
+        Task OnLoad();
+
+        Task OnUnload();
+    }
+
+    public abstract class IPluginEntry : IPlugin
     {
         [Inject] public IServiceCollection services { get; init; }
         [Inject] public string RootFolder { get; init; }
@@ -29,8 +36,8 @@ namespace Luban.Core.Services.Plugins
         {
             var result = new Dictionary<string, object>();
             //var datetime = DateTime.Now.ToString("yyyyMMddHHmmss");
-            result["RelativeFilePath"] = Utils.PathCombine("Plugins", Config.Name, $"plugin_.log");
-            result["LogTag"] = Config.Name;
+            result[LogParams.RelativeFilePath] = Utils.PathCombine("Plugins", Config.Name, $"plugin_.log");
+            result[LogParams.LogTag] = Config.Name;
             return result;
         }
 
