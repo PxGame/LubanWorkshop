@@ -1,0 +1,16 @@
+name: Luban Workshop
+on:
+  push:
+    branches:
+    - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: main step
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+        cache: true
+    - run: dotnet build
