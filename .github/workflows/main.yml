@@ -6,10 +6,13 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    name: main step
+    name: Build & Publish
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v4
       with:
         global-json-file: global.json
-    - run: dotnet build
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build
