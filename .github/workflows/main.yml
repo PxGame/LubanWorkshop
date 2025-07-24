@@ -5,7 +5,7 @@ on:
     - master
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     name: main step
     steps:
     - uses: actions/checkout@v4
