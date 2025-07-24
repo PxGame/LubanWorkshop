@@ -13,4 +13,9 @@ jobs:
       with:
         global-json-file: global.json
     - name: Build
-      run:  dotnet build ./src/Luban.UI/Luban.UI.Desktop/
+      run:  dotnet publish --sc -c Release ./src/Luban.UI/Luban.UI.Browser/
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v4  # 官方部署 Action
+      with:
+        target-branch: gh-pages      # 目标分支
+        publish-dir: './build/publish/Luban.UI.Browser/release'        # 产物目录
