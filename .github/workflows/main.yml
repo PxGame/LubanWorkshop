@@ -1,0 +1,25 @@
+name: Luban Workshop
+on:
+  push:
+    branches:
+    - master
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      id-token: write
+      contents: write
+    name: Build App
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+    - name: Build
+      run:  dotnet publish --sc -c Release ./src/Luban.UI/Luban.UI.Browser/
+    - name: Publish
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{secrets.GITHUB_TOKEN}}
+        publish_dir: './build/publish/Luban.UI.Browser/release/wwwroot'
+        publish_branch: publish/web
