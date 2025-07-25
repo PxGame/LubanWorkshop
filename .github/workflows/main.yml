@@ -20,6 +20,6 @@ jobs:
     - name: Publish
       uses: peaceiris/actions-gh-pages@v4
       with:
-        target-branch: publish/web
         github_token: ${{secrets.GITHUB_TOKEN}}
-        publish-dir: './build/publish/Luban.UI.Browser/release'
+        publish_dir: './build/publish/Luban.UI.Browser/release'
+        publish_branch: publish/web
