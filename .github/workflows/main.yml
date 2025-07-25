@@ -18,7 +18,7 @@ jobs:
     - name: Build
       run:  dotnet publish --sc -c Release ./src/Luban.UI/Luban.UI.Browser/
     - name: Publish
-      uses: actions/deploy-pages@v4
+      uses: peaceiris/actions-gh-pages@v3
       with:
         target-branch: publish/web
         github_token: ${{secrets.GITHUB_TOKEN}}
