@@ -17,5 +17,6 @@ jobs:
     - name: Publish
       uses: actions/deploy-pages@v4
       with:
-        target-branch: publish/web      # 目标分支
+        target-branch: publish/web
+        github_token: ${{secrets.GITHUB_TOKEN}}
         publish-dir: './build/publish/Luban.UI.Browser/release'
