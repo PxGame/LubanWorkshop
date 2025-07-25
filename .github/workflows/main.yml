@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    name: Build & Publish
+    name: Build App
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v4
@@ -14,8 +14,8 @@ jobs:
         global-json-file: global.json
     - name: Build
       run:  dotnet publish --sc -c Release ./src/Luban.UI/Luban.UI.Browser/
-    - name: Deploy to GitHub Pages
-      uses: actions/deploy-pages@v4  # 官方部署 Action
+    - name: Publish
+      uses: actions/deploy-pages@v4
       with:
-        target-branch: gh-pages      # 目标分支
-        publish-dir: './build/publish/Luban.UI.Browser/release'        # 产物目录
+        target-branch: publish/web      # 目标分支
+        publish-dir: './build/publish/Luban.UI.Browser/release'
