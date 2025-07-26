@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "Luban.UI.Browser",
   "resources": {
-    "hash": "sha256-vqn7cUEe08YyaE3p+U2EF9eb6V1pRQg4+2BbIGOg4ow=",
+    "hash": "sha256-MF2TyYHHrnhPJ3cYgCcZiK7zKJbMzpLFn9kqNcslwNE=",
     "fingerprinting": {
       "Avalonia.Base.muvy0o2b9w.wasm": "Avalonia.Base.wasm",
       "Avalonia.Browser.yniyialsmm.wasm": "Avalonia.Browser.wasm",
@@ -17,8 +17,8 @@
       "Avalonia.Vulkan.59seodkcvv.wasm": "Avalonia.Vulkan.wasm",
       "CommunityToolkit.Mvvm.5hyixqpy3r.wasm": "CommunityToolkit.Mvvm.wasm",
       "HarfBuzzSharp.cy001vg1as.wasm": "HarfBuzzSharp.wasm",
-      "Luban.UI.Browser.9oigb15m74.wasm": "Luban.UI.Browser.wasm",
-      "Luban.UI.pt7y4yk9i1.wasm": "Luban.UI.wasm",
+      "Luban.UI.Browser.bmixo2vka5.wasm": "Luban.UI.Browser.wasm",
+      "Luban.UI.4imnw7a7xm.wasm": "Luban.UI.wasm",
       "SkiaSharp.usm18rrwk7.wasm": "SkiaSharp.wasm",
       "System.Collections.Concurrent.87qckht40g.wasm": "System.Collections.Concurrent.wasm",
       "System.Collections.NonGeneric.4obdry5n9j.wasm": "System.Collections.NonGeneric.wasm",
@@ -77,8 +77,8 @@
       "Avalonia.Vulkan.59seodkcvv.wasm": "sha256-d83QFKiah3KClWoSrirr+5NISZfFWv2o3/Wl0tdiq4U=",
       "CommunityToolkit.Mvvm.5hyixqpy3r.wasm": "sha256-9wdUoMlX4v/fGikLTORlu5RfptZKyTnBf/ouKPdWY4Q=",
       "HarfBuzzSharp.cy001vg1as.wasm": "sha256-LD4DDxWYB8eJRkzg5sQhaTFNm/yXdvyvPbJ5H+WvtaY=",
-      "Luban.UI.Browser.9oigb15m74.wasm": "sha256-iSEsRgq0x5tpXMAHZIlT8JuH/UcXtBqqMaE9479l9oI=",
-      "Luban.UI.pt7y4yk9i1.wasm": "sha256-HSjMUO11s/Ve3BZcLLziNMcQ7U22DJdbDkVldK1kTO0=",
+      "Luban.UI.Browser.bmixo2vka5.wasm": "sha256-fdPdD0DXeu/7HGa3tFLiZsYx5ytqcwfaWfRZGMOxdNc=",
+      "Luban.UI.4imnw7a7xm.wasm": "sha256-VDJtAyASIsK+ztNckCC7pnd+lgVQVV/AcUXXxNS+YGE=",
       "SkiaSharp.usm18rrwk7.wasm": "sha256-ri2MDLvyTIJQ7sN90O2Dbg8Sk5Arm6lR9DErc1dMBZk=",
       "System.Collections.Concurrent.87qckht40g.wasm": "sha256-pFfs/MNIml4XzfFL3iBsBLNg1mPy+A8rnKzFGzhcrYg=",
       "System.Collections.NonGeneric.4obdry5n9j.wasm": "sha256-VE9PJMXPBzhvkhMLSeTrzWKoNmzHGGuJCmNbK+j4MRw=",
