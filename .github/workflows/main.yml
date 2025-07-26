@@ -1,14 +1,22 @@
 name: Luban Workshop
 on:
   push:
-    branches:
-    - master
+    branches: ["master"]
+  workflow_dispatch:
+ 
+permissions:
+  id-token: write
+  contents: write
+  pages: write
+
+concurrency:
+  group: "Luban"
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: write
+
     name: Build WASM
     steps:
     - uses: actions/checkout@v4

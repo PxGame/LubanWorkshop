@@ -80,7 +80,8 @@ namespace Luban.Core.Services.Settings
 
         public bool TryGetValue<T>(string key, out T value)
         {
-            if (_rawData.TryGetValue(key, out JToken token))
+            var token = _rawData.SelectToken(key, false);
+            if (token != null)
             {
                 value = token.ToObject<T>();
                 return true;
@@ -96,10 +97,6 @@ namespace Luban.Core.Services.Settings
     internal class SettingService : ISettingService
     {
         private IStorageService storage { get; set; }
-
-        public ISetting MainSetting { get; private set; }
-
-        public ISetting UserSetting { get; private set; }
 
         public override void OnResolved()
         {
@@ -127,7 +124,12 @@ namespace Luban.Core.Services.Settings
 
         public override async Task OnServiceInitialing()
         {
+            await base.OnServiceInitialing();
+
             storage = Container.Resolve<IStorageService>();
+
+            MainSetting = Container.Resolve<ISetting>([new SettingAttribute(FileStorageType.AppFolder, "setting.json")]);
+            UserSetting = Container.Resolve<ISetting>([new SettingAttribute(FileStorageType.UserFolder, "setting.json")]);
 
             await Task.CompletedTask;
         }
@@ -137,9 +139,6 @@ namespace Luban.Core.Services.Settings
             await base.OnServiceInitialized();
             Log.Information($"OnServiceInitialized");
             Log.Information($"\nAppFolder : {Utils.AppFolder}\nAppDataFolder : {Utils.UserFolder}");
-
-            MainSetting = Container.Resolve<ISetting>([new SettingAttribute(FileStorageType.AppFolder, "setting.json")]);
-            UserSetting = Container.Resolve<ISetting>([new SettingAttribute(FileStorageType.UserFolder, "setting.json")]);
 
             await Task.CompletedTask;
         }
@@ -153,18 +152,19 @@ namespace Luban.Core.Services.Settings
             await Task.CompletedTask;
         }
 
-        public override JObject Load(FileStorageType storageType, string relativePath)
+        internal override JObject Load(FileStorageType storageType, string relativePath)
         {
             var jsonStr = storage.ReadFileText(storageType, relativePath);
-            if (string.IsNullOrEmpty(jsonStr)) { return new JObject(); }
-            var jsonObj = JObject.Parse(jsonStr);
+            jsonStr.Wait();
+            if (string.IsNullOrEmpty(jsonStr.Result)) { return new JObject(); }
+            var jsonObj = JObject.Parse(jsonStr.Result);
             return jsonObj;
         }
 
-        public override void Save(FileStorageType storageType, string relativePath, JObject setting)
+        internal override void Save(FileStorageType storageType, string relativePath, JObject setting)
         {
             var jsonStr = setting.ToString(Formatting.Indented);
-            storage.WriteFileText(storageType, relativePath, jsonStr);
+            storage.WriteFileText(storageType, relativePath, jsonStr).Wait();
         }
     }
 }

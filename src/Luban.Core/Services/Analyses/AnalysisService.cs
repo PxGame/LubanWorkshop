@@ -26,6 +26,7 @@ namespace Luban.Core.Services.Analyses
 
         public override async Task OnServiceInitialing()
         {
+            await base.OnServiceInitialing();
             Setting = Container.Resolve<ISettingService>();
             await Task.CompletedTask;
         }

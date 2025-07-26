@@ -13,11 +13,14 @@ namespace Luban.Services
 
         public abstract void OnInstanceReleased();
 
-        public abstract Task OnServiceInitialing();
+        public virtual async Task OnServiceInitialing()
+        {
+            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = GetType().Name }]);
+            await Task.CompletedTask;
+        }
 
         public virtual async Task OnServiceInitialized()
         {
-            Log = Container.Resolve<ILog>([new LogAttribute() { Tag = GetType().Name }]);
             await Task.CompletedTask;
         }
 

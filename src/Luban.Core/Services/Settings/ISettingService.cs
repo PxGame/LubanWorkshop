@@ -6,8 +6,12 @@ namespace Luban.Core.Services.Settings
 {
     public abstract class ISettingService : IService
     {
-        public abstract JObject Load(FileStorageType storageType, string relativePath);
+        public ISetting MainSetting { get; protected set; }
 
-        public abstract void Save(FileStorageType storageType, string relativePath, JObject setting);
+        public ISetting UserSetting { get; protected set; }
+
+        internal abstract JObject Load(FileStorageType storageType, string relativePath);
+
+        internal abstract void Save(FileStorageType storageType, string relativePath, JObject setting);
     }
 }

@@ -1,3 +1,10 @@
 {
-  "Version": "1.0.0"
+  "Version": "1.0.0",
+  "Storage": {
+    "FTP": {
+      "Host": "45.77.135.38",
+      "Username": "lubanuser",
+      "Password": "Luban2025"
+    }
+  }
 }

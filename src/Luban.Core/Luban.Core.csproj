@@ -7,11 +7,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentFTP" />
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Expressions" />
     <PackageReference Include="Serilog.Sinks.Async" />
     <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.Debug" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Serilog.Sinks.Map" />
   </ItemGroup>

@@ -45,12 +45,9 @@ internal class Program
 
     private static async Task Main(string[] args)
     {
-        AppEntry entry = new AppEntry();
-
-        await entry.Initialize();
-        await entry.Shutdown();
-
-        entry.Dispose();
+        await AppEntry.Current.Initialize();
+        await AppEntry.Current.Shutdown();
+        AppEntry.Current.Dispose();
 
         //JObject obj = new JObject();
 

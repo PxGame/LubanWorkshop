@@ -75,6 +75,7 @@ namespace Luban.Core.Services.Events
 
         public override async Task OnServiceInitialing()
         {
+            await base.OnServiceInitialing();
             await Task.CompletedTask;
         }
 

@@ -42,6 +42,7 @@ namespace Luban.Core.Services.Plugins
 
         public override async Task OnServiceInitialing()
         {
+            await base.OnServiceInitialing();
             Setting = Container.Resolve<ISettingService>();
             Analysis = Container.Resolve<IAnalysisService>();
 
@@ -59,8 +60,9 @@ namespace Luban.Core.Services.Plugins
 
         private async Task LoadAll()
         {
-            await LoadAllFromFolder(Utils.AppPluginsFolder);
-            await LoadAllFromFolder(Utils.UserPluginsFolder);
+            //await LoadAllFromFolder(Utils.AppPluginsFolder);
+            //await LoadAllFromFolder(Utils.UserPluginsFolder);
+            await Task.CompletedTask;
         }
 
         private async Task LoadAllFromFolder(string pluginsFolder)

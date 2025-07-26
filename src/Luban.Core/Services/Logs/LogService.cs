@@ -23,6 +23,39 @@ namespace Luban.Core.Services.Logs
 
         public override void OnResolved()
         {
+            var logFormat = "[{@t:yyyy-MM-dd HH:mm:ss.fff}]" +
+              "[{@l:u3}]" +
+              "{#if " + LogParams.LogTag + " is not null}[{" + LogParams.LogTag + "}]{#end}" +
+              "{@m:lj}\n" +
+              "{#if @x is not null}{@x}\n{#end}";
+
+            var outputConsoleTemplate = new ExpressionTemplate(
+                    logFormat, theme: TemplateTheme.Code
+                );
+            var outputFileTemplate = new ExpressionTemplate(
+                    logFormat
+                );
+
+            Serilog.Log.Logger = _rootLogger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Debug()
+                .WriteTo.Async(t =>
+                {
+                    t.Console(outputConsoleTemplate);
+                    t.Map(LogParams.RelativeFilePath, (relativeFilePath, lc) =>
+                    {
+                        var filePath = Utils.PathCombine(Utils.AppLogFolder, relativeFilePath);
+                        lc.File(outputFileTemplate, filePath, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
+                    });
+                    t.Logger(lc =>
+                    {
+                        var filePath = Utils.PathCombine(Utils.AppLogFolder, $"main_.log");
+                        lc.Filter.ByExcluding(t => t.Properties.ContainsKey(LogParams.RelativeFilePath))
+                            .WriteTo.File(outputFileTemplate, filePath, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
+                    });
+                })
+                .CreateLogger();
+
             Container.RegisterType(typeof(ILog), OnCreateLog, false, null, false);
         }
 
@@ -63,38 +96,7 @@ namespace Luban.Core.Services.Logs
 
         public override async Task OnServiceInitialing()
         {
-            var logFormat = "[{@t:yyyy-MM-dd HH:mm:ss.fff}]" +
-                "[{@l:u3}]" +
-                "{#if " + LogParams.LogTag + " is not null}[{" + LogParams.LogTag + "}]{#end}" +
-                "{@m:lj}\n" +
-                "{#if @x is not null}{@x}\n{#end}";
-
-            var outputConsoleTemplate = new ExpressionTemplate(
-                    logFormat, theme: TemplateTheme.Code
-                );
-            var outputFileTemplate = new ExpressionTemplate(
-                    logFormat
-                );
-
-            Serilog.Log.Logger = _rootLogger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Async(t =>
-                {
-                    t.Console(outputConsoleTemplate);
-                    t.Map(LogParams.RelativeFilePath, (relativeFilePath, lc) =>
-                    {
-                        var filePath = Utils.PathCombine(Utils.AppLogFolder, relativeFilePath);
-                        lc.File(outputFileTemplate, filePath, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
-                    });
-                    t.Logger(lc =>
-                    {
-                        var filePath = Utils.PathCombine(Utils.AppLogFolder, $"main_.log");
-                        lc.Filter.ByExcluding(t => t.Properties.ContainsKey(LogParams.RelativeFilePath))
-                            .WriteTo.File(outputFileTemplate, filePath, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
-                    });
-                })
-                .CreateLogger();
-
+            await base.OnServiceInitialing();
             await Task.CompletedTask;
         }
 

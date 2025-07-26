@@ -1,9 +1,7 @@
-﻿using Luban.Core.Services.Logs;
+﻿using FluentFTP;
+using Luban.Core.Services.Settings;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Luban.Core.Services.Storages
@@ -15,8 +13,20 @@ namespace Luban.Core.Services.Storages
         RemoteFolder,
     }
 
+    internal class FtpSetting
+    {
+        public string Host { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
     internal class StorageService : IStorageService
     {
+        private FtpSetting _ftpSetting;
+        private AsyncFtpClient _ftpClient;
+
+        private ISettingService setting { get; set; }
+
         public override void OnResolved()
         {
         }
@@ -28,6 +38,29 @@ namespace Luban.Core.Services.Storages
 
         public override async Task OnServiceInitialing()
         {
+            await base.OnServiceInitialing();
+            setting = Container.Resolve<ISettingService>();
+
+            if (setting.MainSetting.TryGetValue<FtpSetting>("Storage.FTP", out _ftpSetting))
+            {
+                _ftpClient = new AsyncFtpClient(_ftpSetting.Host, _ftpSetting.Username, _ftpSetting.Password);
+                await _ftpClient.AutoConnect();
+            }
+
+            using (var steam = new MemoryStream())
+            {
+                var result = await _ftpClient.DownloadStream(steam, "/luban.txt");
+                if (result)
+                {
+                    steam.Position = 0; // Reset stream position to the beginning
+                    using (var read = new StreamReader(steam))
+                    {
+                        var data = await read.ReadToEndAsync();
+                        Log.Information($"FTP file content: {data}");
+                    }
+                }
+            }
+
             await Task.CompletedTask;
         }
 
@@ -44,7 +77,7 @@ namespace Luban.Core.Services.Storages
             await Task.CompletedTask;
         }
 
-        public override string ReadFileText(FileStorageType storageType, string relativeFilePath)
+        public override async Task<string> ReadFileText(FileStorageType storageType, string relativeFilePath)
         {
             try
             {
@@ -54,20 +87,37 @@ namespace Luban.Core.Services.Storages
                         {
                             var fullPath = Utils.PathCombine(Utils.AppFolder, relativeFilePath);
                             if (!File.Exists(fullPath)) { throw new FileNotFoundException($"File not found: {fullPath}"); }
-                            return File.ReadAllText(fullPath);
+                            return await File.ReadAllTextAsync(fullPath);
                         }
 
                     case FileStorageType.UserFolder:
                         {
                             var fullPath = Utils.PathCombine(Utils.UserFolder, relativeFilePath);
                             if (!File.Exists(fullPath)) { throw new FileNotFoundException($"File not found: {fullPath}"); }
-                            return File.ReadAllText(fullPath);
+                            return await File.ReadAllTextAsync(fullPath);
                         }
 
                     case FileStorageType.RemoteFolder:
-                        // Remote storage handling is not implemented in this example.
-                        throw new NotImplementedException("Remote storage handling is not implemented yet.");
-
+                        {
+                            using (var steam = new MemoryStream())
+                            {
+                                var result = await _ftpClient.DownloadStream(steam, relativeFilePath);
+                                if (result)
+                                {
+                                    steam.Flush();
+                                    steam.Position = 0; // Reset stream position to the beginning
+                                    using (var read = new StreamReader(steam))
+                                    {
+                                        var data = await read.ReadToEndAsync();
+                                        return data;
+                                    }
+                                }
+                                else
+                                {
+                                    return null;
+                                }
+                            }
+                        }
                     default:
                         throw new NotSupportedException($"Unsupported storage type: {storageType}");
                 }
@@ -78,21 +128,21 @@ namespace Luban.Core.Services.Storages
             }
         }
 
-        public override void WriteFileText(FileStorageType storageType, string relativeFilePath, string content)
+        public override async Task<bool> WriteFileText(FileStorageType storageType, string relativeFilePath, string content)
         {
             switch (storageType)
             {
                 case FileStorageType.AppFolder:
                     {
                         var fullPath = Utils.PathCombine(Utils.AppFolder, relativeFilePath);
-                        File.WriteAllText(fullPath, content);
+                        await File.WriteAllTextAsync(fullPath, content);
                     }
                     break;
 
                 case FileStorageType.UserFolder:
                     {
                         var fullPath = Utils.PathCombine(Utils.UserFolder, relativeFilePath);
-                        File.WriteAllText(fullPath, content);
+                        await File.WriteAllTextAsync(fullPath, content);
                     }
                     break;
 
@@ -103,6 +153,8 @@ namespace Luban.Core.Services.Storages
                 default:
                     throw new NotSupportedException($"Unsupported storage type: {storageType}");
             }
+
+            return true;
         }
     }
 }

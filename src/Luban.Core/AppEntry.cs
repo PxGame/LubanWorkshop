@@ -19,6 +19,10 @@ namespace Luban.Core
 {
     public class AppEntry : IAppEntry
     {
+        private static AppEntry _current;
+
+        public static IAppEntry Current => _current ?? (_current = new AppEntry());
+
         private bool _disposedValue = false;
         private Container _container = new Container();
         private ServiceCollection _services = new ServiceCollection();
@@ -28,7 +32,7 @@ namespace Luban.Core
 
         public ILog Log { get; private set; }
 
-        public AppEntry()
+        private AppEntry()
         {
             Container.RegisterInstance<AppEntry, IAppEntry>((_, _, _, _) => this);
         }
