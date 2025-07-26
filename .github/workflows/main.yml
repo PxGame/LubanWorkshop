@@ -29,6 +29,6 @@ jobs:
         server: ${{secrets.FTP_SERVER}}
         username: ${{secrets.FTP_USER}}
         password: ${{secrets.FTP_PW}}
-        local-dir: ./build/publish/Luban.UI.Browser/release
-        server-dir: ./ftproot/plugins/test
+        local-dir: ./build/publish/Luban.UI.Browser/release/
+        server-dir: ./ftproot/plugins/test/
         dangerous-clean-slate: true
