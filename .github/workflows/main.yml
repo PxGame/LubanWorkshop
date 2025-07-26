@@ -5,16 +5,17 @@ on:
     - master
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: write
-    name: Build App
+    name: Build WASM
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v4
       with:
         global-json-file: global.json
+        
     - name: Build
       run:  dotnet publish --sc -c Release ./src/Luban.UI/Luban.UI.Browser/
     - name: Publish
@@ -23,3 +24,27 @@ jobs:
         github_token: ${{secrets.GITHUB_TOKEN}}
         publish_dir: './build/publish/Luban.UI.Browser/release/wwwroot'
         publish_branch: publish/web
+
+  plugins:
+    runs-on: ubuntu-latest
+    name: Build Plugin
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+        
+    - name: Build
+      run:  dotnet publish -c Release ./test/PluginTest/
+    - name: Publish
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{secrets.FTP_SERVER}}
+        username: ${{secrets.FTP_USER}}
+        password: ${{secrets.FTP_PW}}
+        local-dir: ./build/publish/PluginTest/release/
+        server-dir: ./luban/plugins/com.test.plugintest/
+        dangerous-clean-slate: true
+        exclude: |
+          **/*.pdb
+          **/[Ll]uban.?(*.)dll
