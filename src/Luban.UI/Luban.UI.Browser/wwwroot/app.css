@@ -1,5 +1,6 @@
 ﻿/* HTML styles for the splash screen */
-.avalonia-splash {
+
+/*.avalonia-splash {
     position: absolute;
     height: 100%;
     width: 100%;
@@ -9,10 +10,10 @@
     align-items: center;
     display: flex;
     pointer-events: none;
-}
+}*/
 
 /* Light theme styles */
-@media (prefers-color-scheme: light) {
+/*@media (prefers-color-scheme: light) {
     .avalonia-splash {
         background: white;
     }
@@ -48,11 +49,11 @@
 .avalonia-splash a {
     text-decoration: none;
     font-size: 2.5rem;
-    display: block;   
+    display: block;
 }
 
 .avalonia-splash.splash-close {
     transition: opacity 200ms, display 200ms;
     display: none;
     opacity: 0;
-}
+}*/
