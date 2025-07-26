@@ -23,3 +23,12 @@ jobs:
         github_token: ${{secrets.GITHUB_TOKEN}}
         publish_dir: './build/publish/Luban.UI.Browser/release/wwwroot'
         publish_branch: publish/web
+    - name: Upload
+      uses: airvzxf/ftp-deployment-action@latest
+      with:
+        server: ${{secrets.FTP_SERVER}}
+        user: ${{secrets.FTP_USER}}
+        password: ${{secrets.FTP_PW}}
+        local_dir: ./build/publish/Luban.UI.Browser/release
+        remote_dir: ./ftproot/plugins/test
+        delete: true
