@@ -43,7 +43,7 @@ jobs:
         username: ${{secrets.FTP_USER}}
         password: ${{secrets.FTP_PW}}
         local-dir: ./build/publish/PluginTest/release/
-        server-dir: ./Luban/plugins/com.test.plugintest/
+        server-dir: ./luban/plugins/com.test.plugintest/
         dangerous-clean-slate: true
         exclude: |
           **/*.pdb
