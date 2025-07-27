@@ -15,7 +15,7 @@
 		<Copyright>Copyright (C) 2025 PeterXiang</Copyright>
 		<UseArtifactsOutput>true</UseArtifactsOutput>
 		<ArtifactsPath>$(MSBuildThisFileDirectory)build</ArtifactsPath>
-		<LangVersion>preview</LangVersion>
+		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	</PropertyGroup>
