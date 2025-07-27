@@ -2,6 +2,7 @@
 using Luban.Core.Services;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Luban.Core
@@ -14,6 +15,8 @@ namespace Luban.Core
         public static IAppEntry Entry => _entry;
         public static IContainer Container => _entry?.Container;
         public static IServiceCollection Services => _entry?.Services;
+
+        public static bool IsWeb => RuntimeInformation.OSArchitecture == Architecture.Wasm;
 
         public static string AppName => "Luban";
         public static string AppFolder { get; }

@@ -25,14 +25,14 @@ public partial class MainViewModel : ViewModelBase
     {
         Greeting = "start ...";
 
-        await Task.Run(async () =>
+        await Task.Run(() =>
         {
             Dispatcher.UIThread.Post(() => { Greeting = $"Initialize completed ."; });
-            await Utils.Initialize();
+            //await Utils.Initialize();
 
-            var remoteText = await Utils.Services.Storage.ReadFileText(Core.Services.Storages.FileStorageType.RemoteFolder, "./luban.txt");
+            //var remoteText = await Utils.Services.Storage.ReadFileText(Core.Services.Storages.FileStorageType.RemoteFolder, "./luban.txt");
 
-            Dispatcher.UIThread.Post(() => { Greeting = remoteText != null ? $"Read remote file completed ! => {remoteText}" : "Read remote file failed !"; });
+            //Dispatcher.UIThread.Post(() => { Greeting = remoteText != null ? $"Read remote file completed ! => {remoteText}" : "Read remote file failed !"; });
         });
     }
 }

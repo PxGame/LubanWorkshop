@@ -13,68 +13,68 @@ namespace Luban.Core.Services.Logs
 
         public Log(ILogger rootlogger, Dictionary<string, object> propertyDict)
         {
-            _logger = rootlogger.ForContext(this);
+            _logger = rootlogger?.ForContext(this);
             _propertyDict = propertyDict;
         }
 
         public void Verbose(string messageTemplate)
         {
-            _logger.Verbose(messageTemplate);
+            _logger?.Verbose(messageTemplate);
         }
 
         public void Verbose(Exception exception, string messageTemplate)
         {
-            _logger.Verbose(exception, messageTemplate);
+            _logger?.Verbose(exception, messageTemplate);
         }
 
         public void Debug(string messageTemplate)
         {
-            _logger.Debug(messageTemplate);
+            _logger?.Debug(messageTemplate);
         }
 
         public void Debug(Exception exception, string messageTemplate)
         {
-            _logger.Debug(exception, messageTemplate);
+            _logger?.Debug(exception, messageTemplate);
         }
 
         public void Information(string messageTemplate)
         {
-            _logger.Information(messageTemplate);
+            _logger?.Information(messageTemplate);
         }
 
         public void Information(Exception exception, string messageTemplate)
         {
-            _logger.Information(exception, messageTemplate);
+            _logger?.Information(exception, messageTemplate);
         }
 
         public void Warning(string messageTemplate)
         {
-            _logger.Warning(messageTemplate);
+            _logger?.Warning(messageTemplate);
         }
 
         public void Warning(Exception exception, string messageTemplate)
         {
-            _logger.Warning(exception, messageTemplate);
+            _logger?.Warning(exception, messageTemplate);
         }
 
         public void Error(string messageTemplate)
         {
-            _logger.Error(messageTemplate);
+            _logger?.Error(messageTemplate);
         }
 
         public void Error(Exception exception, string messageTemplate)
         {
-            _logger.Error(exception, messageTemplate);
+            _logger?.Error(exception, messageTemplate);
         }
 
         public void Fatal(string messageTemplate)
         {
-            _logger.Fatal(messageTemplate);
+            _logger?.Fatal(messageTemplate);
         }
 
         public void Fatal(Exception exception, string messageTemplate)
         {
-            _logger.Fatal(exception, messageTemplate);
+            _logger?.Fatal(exception, messageTemplate);
         }
 
         public virtual void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
