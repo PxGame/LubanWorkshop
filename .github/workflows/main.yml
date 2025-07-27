@@ -26,6 +26,20 @@ jobs:
         
     - name: Build
       run:  dotnet publish --sc -c Release ./src/Luban.UI/Luban.UI.Browser/
+
+    - name: Publish
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{secrets.FTP_SERVER}}
+        username: ${{secrets.FTP_USER}}
+        password: ${{secrets.FTP_PW}}
+        local-dir: ./build/publish/Luban.UI.Browser/release/
+        server-dir: ./luban.app/web/
+        dangerous-clean-slate: true
+        exclude: |
+          **/*.pdb
+          **/[Ll]uban.?(*.)dll
+
     - name: Publish
       uses: peaceiris/actions-gh-pages@v4
       with:
