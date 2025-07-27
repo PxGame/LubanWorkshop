@@ -1,13 +1,13 @@
+using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Luban.UI.ViewModels;
-using System;
 
 namespace Luban.UI;
 
 public class ViewLocator : IDataTemplate
 {
-    public Control Build(object param)
+    public Control? Build(object? param)
     {
         if (param is null)
             return null;
@@ -23,7 +23,7 @@ public class ViewLocator : IDataTemplate
         return new TextBlock { Text = "Not Found: " + name };
     }
 
-    public bool Match(object data)
+    public bool Match(object? data)
     {
         return data is ViewModelBase;
     }
