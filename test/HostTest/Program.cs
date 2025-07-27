@@ -45,9 +45,8 @@ internal class Program
 
     private static async Task Main(string[] args)
     {
-        await AppEntry.Current.Initialize();
-        await AppEntry.Current.Shutdown();
-        AppEntry.Current.Dispose();
+        await Utils.Initialize();
+        await Utils.Dispose();
 
         //JObject obj = new JObject();
 

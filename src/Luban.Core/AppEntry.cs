@@ -17,12 +17,8 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Luban.Core
 {
-    public class AppEntry : IAppEntry
+    internal class AppEntry : IAppEntry
     {
-        private static AppEntry _current;
-
-        public static IAppEntry Current => _current ?? (_current = new AppEntry());
-
         private bool _disposedValue = false;
         private Container _container = new Container();
         private ServiceCollection _services = new ServiceCollection();
@@ -32,13 +28,14 @@ namespace Luban.Core
 
         public ILog Log { get; private set; }
 
-        private AppEntry()
+        public AppEntry()
         {
-            Container.RegisterInstance<AppEntry, IAppEntry>((_, _, _, _) => this);
         }
 
         public async Task Initialize()
         {
+            Container.RegisterInstance<AppEntry, IAppEntry>((_, _, _, _) => this);
+
             //注册服务
             Container.RegisterInstance<IServiceCollection>((_, _, _, _) => _services);
             Container.RegisterInstance<LogService, ILogService>()

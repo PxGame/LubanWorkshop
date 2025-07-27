@@ -18,4 +18,8 @@
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Luban.Core\Luban.Core.csproj" />
+  </ItemGroup>
 </Project>

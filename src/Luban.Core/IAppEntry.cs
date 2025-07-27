@@ -11,9 +11,5 @@ namespace Luban.Core
         IContainer Container { get; }
 
         IServiceCollection Services { get; }
-
-        Task Initialize();
-
-        Task Shutdown();
     }
 }
