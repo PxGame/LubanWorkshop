@@ -30,7 +30,15 @@ jobs:
     - name: Build
       run:  dotnet publish --sc -c Release ./src/Luban.UI/Luban.UI.Browser/
 
-    - name: Publish
+    - name: Publish to github
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{secrets.GITHUB_TOKEN}}
+        publish_dir: './build/publish/Luban.UI.Browser/release/wwwroot'
+        publish_branch: publish/web
+        exclude_assets: '**/*.pdb'
+        
+    - name: Publish to custom server
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{secrets.FTP_SERVER}}
@@ -41,18 +49,10 @@ jobs:
         dangerous-clean-slate: true
         exclude: |
           **/*.pdb
-          **/[Ll]uban.?(*.)dll
-
-    - name: Publish
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{secrets.GITHUB_TOKEN}}
-        publish_dir: './build/publish/Luban.UI.Browser/release/wwwroot'
-        publish_branch: publish/web
 
   plugins:
     runs-on: ubuntu-latest
-    name: Build Plugin
+    name: Build plugin
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v4
@@ -62,7 +62,7 @@ jobs:
     - name: Build
       run:  dotnet publish -c Release ./test/PluginTest/
       
-    - name: Publish
+    - name: Publish to custom server
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{secrets.FTP_SERVER}}
