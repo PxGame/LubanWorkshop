@@ -1,12 +1,10 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Luban.UI.ViewModels;
 using Luban.UI.Views;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Luban.UI;
 
