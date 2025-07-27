@@ -25,7 +25,7 @@ jobs:
         global-json-file: global.json
         
     - name: Build
-      run:  dotnet publish -c Release ./src/Luban.UI/Luban.UI.Browser/
+      run:  dotnet publish --sc -c Release ./src/Luban.UI/Luban.UI.Browser/
 
     - name: Publish
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
