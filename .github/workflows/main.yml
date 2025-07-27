@@ -23,6 +23,9 @@ jobs:
     - uses: actions/setup-dotnet@v4
       with:
         global-json-file: global.json
+
+    - name: Install tools
+      run: dotnet workload install wasm-tools
         
     - name: Build
       run:  dotnet publish --sc -c Release ./src/Luban.UI/Luban.UI.Browser/
@@ -58,6 +61,7 @@ jobs:
         
     - name: Build
       run:  dotnet publish -c Release ./test/PluginTest/
+      
     - name: Publish
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
