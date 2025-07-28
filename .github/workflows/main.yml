@@ -74,3 +74,28 @@ jobs:
         exclude: |
           **/*.pdb
           **/[Ll]uban.?(*.)dll
+
+  Server:
+    runs-on: ubuntu-latest
+
+    name: Build Server
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+        
+    - name: Build
+      run:  dotnet publish --sc -c Release ./src/Luban.Server/Luban.Server/
+        
+    - name: Publish to custom server
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{secrets.FTP_SERVER}}
+        username: ${{secrets.FTP_USER}}
+        password: ${{secrets.FTP_PW}}
+        local-dir: ./build/publish/Luban.UI.Browser/release/
+        server-dir: ./luban.server
+        dangerous-clean-slate: true
+        exclude: |
+          **/*.pdb
