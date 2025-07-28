@@ -94,7 +94,7 @@ jobs:
         server: ${{secrets.FTP_SERVER}}
         username: ${{secrets.FTP_USER}}
         password: ${{secrets.FTP_PW}}
-        local-dir: ./build/publish/Luban.UI.Browser/release/
+        local-dir: ./build/publish/Luban.Server/release/
         server-dir: ./luban.server/
         dangerous-clean-slate: true
         exclude: |
