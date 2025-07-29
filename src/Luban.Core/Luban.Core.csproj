@@ -7,7 +7,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentFTP" />
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Expressions" />

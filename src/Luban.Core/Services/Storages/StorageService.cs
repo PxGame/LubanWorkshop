@@ -22,9 +22,6 @@ namespace Luban.Core.Services.Storages
 
     internal class StorageService : IStorageService
     {
-        private FtpSetting _ftpSetting;
-        private AsyncFtpClient _ftpClient;
-
         private ISettingService setting { get; set; }
 
         public override void OnResolved()
@@ -40,26 +37,6 @@ namespace Luban.Core.Services.Storages
         {
             await base.OnServiceInitialing();
             setting = Container.Resolve<ISettingService>();
-
-            if (setting.MainSetting.TryGetValue<FtpSetting>("Storage.FTP", out _ftpSetting))
-            {
-                _ftpClient = new AsyncFtpClient(_ftpSetting.Host, _ftpSetting.Username, _ftpSetting.Password);
-                await _ftpClient.AutoConnect();
-            }
-
-            //using (var steam = new MemoryStream())
-            //{
-            //    var result = await _ftpClient.DownloadStream(steam, "/luban.txt");
-            //    if (result)
-            //    {
-            //        steam.Position = 0; // Reset stream position to the beginning
-            //        using (var read = new StreamReader(steam))
-            //        {
-            //            var data = await read.ReadToEndAsync();
-            //            Log.Information($"FTP file content: {data}");
-            //        }
-            //    }
-            //}
 
             await Task.CompletedTask;
         }
@@ -99,24 +76,7 @@ namespace Luban.Core.Services.Storages
 
                     case FileStorageType.RemoteFolder:
                         {
-                            using (var steam = new MemoryStream())
-                            {
-                                var result = await _ftpClient.DownloadStream(steam, relativeFilePath);
-                                if (result)
-                                {
-                                    steam.Flush();
-                                    steam.Position = 0; // Reset stream position to the beginning
-                                    using (var read = new StreamReader(steam))
-                                    {
-                                        var data = await read.ReadToEndAsync();
-                                        return data;
-                                    }
-                                }
-                                else
-                                {
-                                    return null;
-                                }
-                            }
+                            throw new NotImplementedException("Remote storage handling is not implemented yet.");
                         }
                     default:
                         throw new NotSupportedException($"Unsupported storage type: {storageType}");
