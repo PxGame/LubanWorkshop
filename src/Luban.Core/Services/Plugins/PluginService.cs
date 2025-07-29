@@ -54,7 +54,10 @@ namespace Luban.Core.Services.Plugins
             await base.OnServiceInitialized();
             Log.Information($"OnServiceInitialized");
 
-            await LoadAll();
+            if (!Utils.IsWeb)
+            {
+                await LoadAll();
+            }
             await Task.CompletedTask;
         }
 

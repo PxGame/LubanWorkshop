@@ -1,5 +1,4 @@
-﻿using FluentFTP;
-using Luban.Core.Services.Settings;
+﻿using Luban.Core.Services.Settings;
 using System;
 using System.IO;
 using System.Threading.Tasks;

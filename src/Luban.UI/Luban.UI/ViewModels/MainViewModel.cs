@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Luban.Core;
+using System.Runtime.InteropServices.JavaScript;
 using System.Threading.Tasks;
 
 namespace Luban.UI.ViewModels;
@@ -23,16 +24,13 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task OnReadRemote()
     {
-        Greeting = "start ...";
-
-        await Task.Run(() =>
+        await Task.Run(async () =>
         {
+            Dispatcher.UIThread.Post(() => { Greeting = $"AppEntry start ."; });
+            await Utils.Initialize();
             Dispatcher.UIThread.Post(() => { Greeting = $"Initialize completed ."; });
-            //await Utils.Initialize();
-
-            //var remoteText = await Utils.Services.Storage.ReadFileText(Core.Services.Storages.FileStorageType.RemoteFolder, "./luban.txt");
-
-            //Dispatcher.UIThread.Post(() => { Greeting = remoteText != null ? $"Read remote file completed ! => {remoteText}" : "Read remote file failed !"; });
+            await Utils.Dispose();
+            Dispatcher.UIThread.Post(() => { Greeting = $"Dispose completed ."; });
         });
     }
 }

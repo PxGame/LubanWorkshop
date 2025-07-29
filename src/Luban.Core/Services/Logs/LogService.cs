@@ -38,21 +38,31 @@ namespace Luban.Core.Services.Logs
 
             Serilog.Log.Logger = _rootLogger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.Debug()
                 .WriteTo.Async(t =>
                 {
-                    t.Console(outputConsoleTemplate);
-                    t.Map(LogParams.RelativeFilePath, (relativeFilePath, lc) =>
+#if DEBUG
+                    t.Debug();
+#endif
+                    if (Utils.IsWeb)
                     {
-                        var filePath = Utils.PathCombine(Utils.AppLogFolder, relativeFilePath);
-                        lc.File(outputFileTemplate, filePath, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
-                    });
-                    t.Logger(lc =>
+                        t.BrowserConsole();
+                    }
+                    else
                     {
-                        var filePath = Utils.PathCombine(Utils.AppLogFolder, $"main_.log");
-                        lc.Filter.ByExcluding(t => t.Properties.ContainsKey(LogParams.RelativeFilePath))
-                            .WriteTo.File(outputFileTemplate, filePath, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
-                    });
+                        t.Console(outputConsoleTemplate);
+
+                        t.Map(LogParams.RelativeFilePath, (relativeFilePath, lc) =>
+                        {
+                            var filePath = Utils.PathCombine(Utils.AppLogFolder, relativeFilePath);
+                            lc.File(outputFileTemplate, filePath, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
+                        });
+                        t.Logger(lc =>
+                        {
+                            var filePath = Utils.PathCombine(Utils.AppLogFolder, $"main_.log");
+                            lc.Filter.ByExcluding(t => t.Properties.ContainsKey(LogParams.RelativeFilePath))
+                                .WriteTo.File(outputFileTemplate, filePath, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
+                        });
+                    }
                 })
                 .CreateLogger();
 
