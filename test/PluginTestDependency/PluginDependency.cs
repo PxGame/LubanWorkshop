@@ -2,6 +2,6 @@
 {
     public class PluginDependency
     {
-        public string GetName() => "PluginDependency 2";
+        public string GetName() => "PluginDependency";
     }
 }

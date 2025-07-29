@@ -47,19 +47,19 @@ namespace Luban.Core.Services.Storages
                 await _ftpClient.AutoConnect();
             }
 
-            using (var steam = new MemoryStream())
-            {
-                var result = await _ftpClient.DownloadStream(steam, "/luban.txt");
-                if (result)
-                {
-                    steam.Position = 0; // Reset stream position to the beginning
-                    using (var read = new StreamReader(steam))
-                    {
-                        var data = await read.ReadToEndAsync();
-                        Log.Information($"FTP file content: {data}");
-                    }
-                }
-            }
+            //using (var steam = new MemoryStream())
+            //{
+            //    var result = await _ftpClient.DownloadStream(steam, "/luban.txt");
+            //    if (result)
+            //    {
+            //        steam.Position = 0; // Reset stream position to the beginning
+            //        using (var read = new StreamReader(steam))
+            //        {
+            //            var data = await read.ReadToEndAsync();
+            //            Log.Information($"FTP file content: {data}");
+            //        }
+            //    }
+            //}
 
             await Task.CompletedTask;
         }

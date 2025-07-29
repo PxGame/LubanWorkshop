@@ -10,24 +10,16 @@ namespace PluginTest
 {
     public class PluginEntry : IPluginEntry
     {
-        public override void OnResolved()
-        {
-            Log.Information($"OnResolved 5 > {RootFolder} | {this.Config.Name}");
-
-            //UserSetting.Data.Name = UserSetting.Data.Name + "0";
-        }
-
         public override async Task OnLoad()
         {
-            Log.Information($"OnLoad 5 > {new PluginDependency().GetName()} | {RootFolder}");
-            await Task.CompletedTask;
+            await base.OnLoad();
+            Log.Information($"OnLoad Call Dependency : {new PluginDependency().GetName()}");
         }
 
         public override async Task OnUnload()
         {
             await base.OnUnload();
-            Log.Information($"OnUnload 5 > {new PluginDependency().GetName()} | {RootFolder}");
-            await Task.CompletedTask;
+            Log.Information($"OnUnload Call Dependency : {new PluginDependency().GetName()}");
         }
     }
 }

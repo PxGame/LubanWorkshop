@@ -41,12 +41,20 @@ namespace Luban.Core.Services.Plugins
             return result;
         }
 
-        public abstract void OnResolved();
+        public virtual void OnResolved()
+        {
+            Log.Information($"OnResolved : {Config.Name} > {RootFolder} ");
+        }
 
-        public abstract Task OnLoad();
+        public virtual async Task OnLoad()
+        {
+            Log.Information($"OnLoad : {Config.Name} > {RootFolder} ");
+            await Task.CompletedTask;
+        }
 
         public virtual async Task OnUnload()
         {
+            Log.Information($"OnUnload : {Config.Name} > {RootFolder} ");
             UserSetting.Save();
             await Task.CompletedTask;
         }

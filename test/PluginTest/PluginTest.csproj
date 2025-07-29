@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <BaseOutputPath>C:\ProgramData\Luban\Plugins\PluginTest_</BaseOutputPath>
-  </PropertyGroup>
-
+	<PropertyGroup>
+		<OutputPath>$(ArtifactsPath)/bin/Test/$(Configuration)/Plugins/$(MSBuildProjectName)/</OutputPath>
+	</PropertyGroup>
+	
   <ItemGroup>
     <ProjectReference Include="..\..\src\Luban.Core\Luban.Core.csproj" />
     <ProjectReference Include="..\PluginTestDependency\PluginTestDependency.csproj" />
