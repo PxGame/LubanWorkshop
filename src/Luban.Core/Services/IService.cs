@@ -7,7 +7,7 @@ namespace Luban.Services
     public abstract class IService : IOnResolved, IOnInstanceReleased
     {
         [Inject] protected IContainer Container { get; init; }
-        protected ILog Log { get; private set; }
+        public ILog Log { get; private set; }
 
         public abstract void OnResolved();
 

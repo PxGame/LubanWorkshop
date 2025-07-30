@@ -19,9 +19,16 @@ namespace Luban.Core.Services.Plugins
         private IAnalysisService Analysis { get; set; }
 
         private List<PluginController> controllers = new List<PluginController>();
+        private Dictionary<string, PluginController> name2Ctrl = new Dictionary<string, PluginController>();
 
         public PluginService()
         {
+        }
+
+        public override object InvokeCommand(string pluginName, string cmdName, object[] args)
+        {
+            if (!name2Ctrl.TryGetValue(pluginName, out var controller)) { return null; }
+            return controller.InvokeCommand(cmdName, args);
         }
 
         public override void OnResolved()
@@ -97,11 +104,13 @@ namespace Luban.Core.Services.Plugins
             await controller.Initialize();
             await controller.Load();
             controllers.Add(controller);
+            name2Ctrl[controller.PluginName] = controller;
             return controller;
         }
 
         public async Task Unload(PluginController controller)
         {
+            name2Ctrl.Remove(controller.PluginName);
             controllers.Remove(controller);
             if (controller == null) { return; }
             await controller.Unload();

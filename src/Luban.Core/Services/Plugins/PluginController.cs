@@ -2,10 +2,10 @@
 using Luban.Plugin;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
 using System.Threading.Tasks;
 
 namespace Luban.Core.Services.Plugins
@@ -13,6 +13,8 @@ namespace Luban.Core.Services.Plugins
     public class PluginController : IOnResolved
     {
         public const string ConfigFileName = "plugin.json";
+
+        public string PluginName => _config?.Name;
 
         [Inject]
         private IContainer Container { get; init; }
@@ -24,8 +26,7 @@ namespace Luban.Core.Services.Plugins
         private IPlugin _plugin;
         private PluginConfig _config;
         private PluginLoadContext _pluginLoadContext;
-
-        //private FileSystemWatcher _watcher;
+        private Dictionary<string, MethodInfo> _pluginCmdDict;
 
         public PluginController(string pluginFolder)
         {
@@ -51,6 +52,18 @@ namespace Luban.Core.Services.Plugins
             var entryType = _pluginLoadContext.LoadPluginEntryType();
             if (entryType == null) { throw null; }
 
+            var methods = entryType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            _pluginCmdDict = new Dictionary<string, MethodInfo>();
+            foreach (var method in methods)
+            {
+                var pluginCmdAttr = method.GetCustomAttribute<PluginCommandAttribute>(true);
+                if (pluginCmdAttr == null) { continue; }
+
+                var name = string.IsNullOrEmpty(pluginCmdAttr.Name) ? method.Name : pluginCmdAttr.Name;
+                _pluginCmdDict[name] = method;
+            }
+
             _plugin = Container.Resolve(entryType, [], [],
                 new InjectExtraPropertyValue() {
                     { "RootFolder", _folder},
@@ -58,6 +71,12 @@ namespace Luban.Core.Services.Plugins
                 }) as IPlugin;
 
             await Task.CompletedTask;
+        }
+
+        public object InvokeCommand(string name, object[] args)
+        {
+            if (!_pluginCmdDict.TryGetValue(name, out var method)) { return null; }
+            return method.Invoke(_plugin, args);
         }
 
         public async Task Load()

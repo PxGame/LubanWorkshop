@@ -1,7 +1,7 @@
 ﻿{
   "Name": "com.luban.plugin.common",
   "Version": "1.0.0",
-  "Description": "This is a test plugin for the PluginTest project.",
+  "Description": "This is a common plugin for the luban.core .",
   "DisplayName": "鲁班公共插件",
   "DocumentationUrl": "https://docs.unity.cn/Manual/upm-manifestPkg.html",
   "LicenesesUrl": "https://developer.unity.cn/",
