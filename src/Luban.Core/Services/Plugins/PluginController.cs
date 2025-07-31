@@ -1,6 +1,7 @@
 ﻿using Luban.Core.Containers;
 using Luban.Plugin;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -73,9 +74,30 @@ namespace Luban.Core.Services.Plugins
             await Task.CompletedTask;
         }
 
-        public object InvokeCommand(string name, object[] args)
+        public object InvokeCommand(string name, IReadOnlyDictionary<string, JObject> jsonArgs)
         {
             if (!_pluginCmdDict.TryGetValue(name, out var method)) { return null; }
+
+            var paramInfos = method.GetParameters();
+            var args = new object[paramInfos.Length];
+
+            for (int i = 0; i < paramInfos.Length; i++)
+            {
+                var paramInfo = paramInfos[i];
+                object argValue = null;
+                if (jsonArgs.TryGetValue(paramInfo.Name, out var jsonValue))
+                {
+                    argValue = jsonValue.ToObject(paramInfo.ParameterType);
+                }
+
+                if (argValue == null)
+                {
+                    argValue = Activator.CreateInstance(paramInfo.ParameterType);
+                }
+
+                args[i] = argValue;
+            }
+
             return method.Invoke(_plugin, args);
         }
 

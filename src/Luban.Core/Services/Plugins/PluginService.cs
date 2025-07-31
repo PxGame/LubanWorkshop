@@ -3,6 +3,7 @@ using Luban.Core.Services.Analyses;
 using Luban.Core.Services.Logs;
 using Luban.Core.Services.Settings;
 using Luban.Plugin;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,10 +26,21 @@ namespace Luban.Core.Services.Plugins
         {
         }
 
-        public override object InvokeCommand(string pluginName, string cmdName, object[] args)
+        public override object InvokeCommand(string pluginName, string cmdName, IReadOnlyDictionary<string, object> args)
         {
             if (!name2Ctrl.TryGetValue(pluginName, out var controller)) { return null; }
-            return controller.InvokeCommand(cmdName, args);
+
+            Dictionary<string, JObject> jsonArgs = new Dictionary<string, JObject>();
+
+            if (args != null)
+            {
+                foreach (var kv in args)
+                {
+                    jsonArgs[kv.Key] = JObject.FromObject(kv.Value);
+                }
+            }
+
+            return controller.InvokeCommand(cmdName, jsonArgs);
         }
 
         public override void OnResolved()
