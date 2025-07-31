@@ -61,7 +61,7 @@ namespace Luban.Core.Services.Plugins
         public virtual async Task OnUnload()
         {
             Log.Information($"OnUnload : {Config.Name} > {RootFolder} ");
-            UserSetting.Save();
+            //UserSetting.Save();
             await Task.CompletedTask;
         }
     }

@@ -88,6 +88,7 @@ namespace Luban.Core.Services.Plugins
         {
             await _plugin.OnUnload();
             _plugin = null;
+            _pluginCmdDict = null;
 
             var contextWeak = new WeakReference(_pluginLoadContext);
             _pluginLoadContext.Unload();
