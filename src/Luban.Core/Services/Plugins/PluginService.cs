@@ -40,7 +40,7 @@ namespace Luban.Core.Services.Plugins
                 }
             }
 
-            return controller.InvokeCommand(cmdName, jsonArgs);
+            return controller.InvokeCommand(cmdName, cmdName, jsonArgs);
         }
 
         public override void OnResolved()

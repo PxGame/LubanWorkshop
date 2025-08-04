@@ -24,14 +24,8 @@ namespace Luban.Core.Services.Plugins
         [Log(Tag = "Plugin", CustomPropertyMethodName = nameof(GetLogCustomProperty))]
         [Inject] public ILog Log { get; init; }
 
-        [Setting(Storages.FileStorageType.UserFolder, "setting.json", RelativeRootPathMethodName = nameof(GetSettingRelativeRootPath))]
-        [Inject] public ISetting UserSetting { get; init; }
-
-        [PluginCommand(Name = "GetPluginConfig")]
-        public IPluginConfig GetConfig()
-        {
-            return Config;
-        }
+        //[Setting(Storages.FileStorageType.UserFolder, "setting.json", RelativeRootPathMethodName = nameof(GetSettingRelativeRootPath))]
+        //[Inject] public ISetting UserSetting { get; init; }
 
         protected virtual string GetSettingRelativeRootPath()
         {
@@ -55,6 +49,7 @@ namespace Luban.Core.Services.Plugins
         public virtual async Task OnLoad()
         {
             Log.Information($"OnLoad : {Config.Name} > {RootFolder} ");
+
             await Task.CompletedTask;
         }
 

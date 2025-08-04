@@ -22,6 +22,10 @@ namespace Luban.Core.Services.Plugins
         private readonly string _mainAssemblyPath;
         private readonly AssemblyDependencyResolver _dependencyResolver;
 
+        private Assembly _mainAssembly;
+        public Type PluginEntryType { get; private set; }
+        public HashSet<Type> PluginCommandTypes { get; private set; } = new HashSet<Type>();
+
         public PluginLoadContext(
             string pluginFolder,
             PluginConfig pluginConfig
@@ -36,14 +40,24 @@ namespace Luban.Core.Services.Plugins
             _dependencyResolver = new AssemblyDependencyResolver(_mainAssemblyPath);
         }
 
-        public Type LoadPluginEntryType()
+        public void InitializeMainAssembly()
         {
-            var mainAssembly = LoadAssemblyFromFilePath(_mainAssemblyPath);
+            if (_mainAssembly == null) { _mainAssembly = LoadAssemblyFromFilePath(_mainAssemblyPath); }
 
-            var pluginType = mainAssembly.GetTypes()
-                .FirstOrDefault(t => t.IsClass && typeof(IPluginEntry).IsAssignableFrom(t), null);
+            var types = _mainAssembly.GetTypes();
 
-            return pluginType;
+            foreach (var type in types)
+            {
+                if (!type.IsClass) { continue; }
+                if (typeof(IPluginEntry).IsAssignableFrom(type))
+                {
+                    PluginEntryType = type;
+                }
+                if (type.GetCustomAttribute<PCmdGroupAttribute>() != null)
+                {
+                    PluginCommandTypes.Add(type);
+                }
+            }
         }
 
         protected override Assembly Load(AssemblyName assemblyName)
