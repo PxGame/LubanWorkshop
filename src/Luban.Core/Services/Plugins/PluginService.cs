@@ -26,21 +26,11 @@ namespace Luban.Core.Services.Plugins
         {
         }
 
-        public override object InvokeCommand(string pluginName, string cmdName, IReadOnlyDictionary<string, object> args)
+        public override async Task<T> InvokeCmdAsync<T>(string pluginName, string groupName, string cmdName, Dictionary<string, object> args)
         {
-            if (!name2Ctrl.TryGetValue(pluginName, out var controller)) { return null; }
-
-            Dictionary<string, JObject> jsonArgs = new Dictionary<string, JObject>();
-
-            if (args != null)
-            {
-                foreach (var kv in args)
-                {
-                    jsonArgs[kv.Key] = JObject.FromObject(kv.Value);
-                }
-            }
-
-            return controller.InvokeCommand(cmdName, cmdName, jsonArgs);
+            if (!name2Ctrl.TryGetValue(pluginName, out var controller)) { throw new Exception(); }
+            var result = await controller.InvokeCmdAsync<T>(groupName, cmdName, args);
+            return result;
         }
 
         public override void OnResolved()
