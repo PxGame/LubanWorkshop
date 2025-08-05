@@ -69,7 +69,7 @@ namespace Luban.Core.Services.Plugins
             return builder.ToString();
         }
 
-        internal async Task<JObject> InvokeAsync(object target, Dictionary<string, JObject> name2value)
+        internal async Task<JToken> InvokeAsync(object target, Dictionary<string, JToken> name2value)
         {
             if (Method == null) { throw new InvalidOperationException("Method is not set."); }
 
@@ -97,7 +97,7 @@ namespace Luban.Core.Services.Plugins
                 if (Ret.Type.IsGenericType && Ret.Type.GetGenericTypeDefinition() == typeof(Task<>))
                 {
                     var taskResult = Ret.Type.GetProperty("Result").GetValue(task);
-                    return JObject.FromObject(taskResult);
+                    return JToken.FromObject(taskResult);
                 }
                 else
                 {
@@ -106,7 +106,7 @@ namespace Luban.Core.Services.Plugins
             }
             else
             {
-                return JObject.FromObject(result);
+                return JToken.FromObject(result);
             }
         }
     }
@@ -298,13 +298,13 @@ namespace Luban.Core.Services.Plugins
             var cmd = cmdGroup.Commands.Find(t => t.Name == cmdName);
             if (cmdGroup == null) { throw new Exception(); }
 
-            Dictionary<string, JObject> jsonArgs = new Dictionary<string, JObject>();
+            Dictionary<string, JToken> jsonArgs = new Dictionary<string, JToken>();
 
             if (args != null)
             {
                 foreach (var kv in args)
                 {
-                    jsonArgs[kv.Key] = JObject.FromObject(kv.Value);
+                    jsonArgs[kv.Key] = JToken.FromObject(kv.Value);
                 }
             }
 

@@ -27,6 +27,17 @@ namespace Test
 
             Console.WriteLine($"result : {result}");
 
+            var result2 = await Utils.Services.Plugin.InvokeCmdAsync<string>("com.luban.plugin.common", "common",
+                "test2",
+                new Dictionary<string, object>()
+                    {
+                        { "A2", 123 },
+                        { "B2", "Hello" },
+                        { "C2", true }
+                    }
+                );
+            Console.WriteLine($"result2 : {result2}");
+
             await Utils.Dispose();
 
             Console.WriteLine("End !");
