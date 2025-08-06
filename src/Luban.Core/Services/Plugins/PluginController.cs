@@ -14,137 +14,6 @@ using System.Threading.Tasks;
 
 namespace Luban.Core.Services.Plugins
 {
-    internal class PluginCommandRet
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public Type Type { get; set; }
-
-        public override string ToString()
-        {
-            return $"{Name}({Description})";
-        }
-    }
-
-    internal class PluginCommandArg
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public Type Type { get; set; }
-
-        public override string ToString()
-        {
-            return $"{Name}({Description})";
-        }
-    }
-
-    internal class PluginCommand
-    {
-        public MethodInfo Method { get; set; }
-
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public List<PluginCommandArg> Args { get; set; }
-        public PluginCommandRet Ret { get; set; }
-
-        public override string ToString()
-        {
-            var builder = new StringBuilder();
-            builder.AppendLine($"Command : {Name}");
-            builder.AppendLine($"Description : {Description}");
-            if (Args != null && Args.Count > 0)
-            {
-                builder.AppendLine("Arguments : ");
-                for (int i = 0; i < Args.Count; i++)
-                {
-                    var arg = Args[i];
-                    builder.AppendLine($"  {i} - {arg}");
-                }
-            }
-            if (Ret != null)
-            {
-                builder.AppendLine($"Return : ");
-                builder.AppendLine($"  {Ret}");
-            }
-            return builder.ToString();
-        }
-
-        internal async Task<JToken> InvokeAsync(object target, Dictionary<string, JToken> name2value)
-        {
-            if (Method == null) { throw new InvalidOperationException("Method is not set."); }
-
-            var argObjs = new object[Args.Count];
-
-            for (int i = 0; i < Args.Count; i++)
-            {
-                var arg = Args[i];
-                if (name2value.TryGetValue(arg.Name, out var value))
-                {
-                    argObjs[i] = value == null ? null : value.ToObject(arg.Type);
-                }
-                else
-                {
-                    throw new ArgumentException($"Argument '{arg.Name}' is required but not provided.");
-                }
-            }
-
-            var result = Method.Invoke(target, argObjs);
-            if (result == null) { return null; }
-
-            if (typeof(Task).IsAssignableFrom(Ret.Type))
-            {
-                var task = result as Task;
-                await task;
-
-                if (Ret.Type.IsGenericType && Ret.Type.GetGenericTypeDefinition() == typeof(Task<>))
-                {
-                    var taskResult = Ret.Type.GetProperty("Result").GetValue(task);
-                    if (taskResult == null) { return null; }
-                    return JToken.FromObject(taskResult);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                return JToken.FromObject(result);
-            }
-        }
-    }
-
-    internal class PluginCommandGroup
-    {
-        public object Target { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public List<PluginCommand> Commands { get; } = new List<PluginCommand>();
-
-        public override string ToString()
-        {
-            var builder = new StringBuilder();
-            builder.AppendLine($"Command Group : {Name}");
-            builder.AppendLine($"Description : {Description}");
-            if (Commands != null && Commands.Count > 0)
-            {
-                builder.AppendLine("Commands :");
-                foreach (var cmd in Commands)
-                {
-                    using var reader = new StringReader(cmd.ToString());
-                    do
-                    {
-                        var line = reader.ReadLine();
-                        if (line == null) { break; }
-                        builder.AppendLine("  " + line);
-                    } while (true);
-                    builder.AppendLine();
-                }
-            }
-            return builder.ToString();
-        }
-    }
-
     internal class PluginController : IOnResolved
     {
         public const string ConfigFileName = "plugin.json";
@@ -299,10 +168,9 @@ namespace Luban.Core.Services.Plugins
             if (cmdGroup == null) { throw new Exception(); }
 
             var cmd = cmdGroup.Commands.Find(t => t.Name == cmdName);
-            if (cmdGroup == null) { throw new Exception(); }
+            if (cmd == null) { throw new Exception(); }
 
             Dictionary<string, JToken> jsonArgs = new Dictionary<string, JToken>();
-
             if (args != null)
             {
                 foreach (var kv in args)
