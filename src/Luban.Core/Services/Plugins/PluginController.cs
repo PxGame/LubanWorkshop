@@ -80,7 +80,7 @@ namespace Luban.Core.Services.Plugins
                 var arg = Args[i];
                 if (name2value.TryGetValue(arg.Name, out var value))
                 {
-                    argObjs[i] = value.ToObject(arg.Type);
+                    argObjs[i] = value == null ? null : value.ToObject(arg.Type);
                 }
                 else
                 {
@@ -89,6 +89,8 @@ namespace Luban.Core.Services.Plugins
             }
 
             var result = Method.Invoke(target, argObjs);
+            if (result == null) { return null; }
+
             if (typeof(Task).IsAssignableFrom(Ret.Type))
             {
                 var task = result as Task;
@@ -97,6 +99,7 @@ namespace Luban.Core.Services.Plugins
                 if (Ret.Type.IsGenericType && Ret.Type.GetGenericTypeDefinition() == typeof(Task<>))
                 {
                     var taskResult = Ret.Type.GetProperty("Result").GetValue(task);
+                    if (taskResult == null) { return null; }
                     return JToken.FromObject(taskResult);
                 }
                 else
@@ -280,7 +283,7 @@ namespace Luban.Core.Services.Plugins
                 var pCmdArg = new PluginCommandArg()
                 {
                     Name = pCmdArgAttr?.Name ?? arg.Name,
-                    Description = pCmdArgAttr.Description ?? arg.Name,
+                    Description = pCmdArgAttr?.Description ?? arg.Name,
                     Type = arg.ParameterType
                 };
 
@@ -304,11 +307,13 @@ namespace Luban.Core.Services.Plugins
             {
                 foreach (var kv in args)
                 {
-                    jsonArgs[kv.Key] = JToken.FromObject(kv.Value);
+                    jsonArgs[kv.Key] = kv.Value == null ? null : JToken.FromObject(kv.Value);
                 }
             }
 
             var resultJson = await cmd.InvokeAsync(cmdGroup.Target, jsonArgs);
+            if (resultJson == null) { return default(T); }
+
             return resultJson.ToObject<T>();
         }
 
