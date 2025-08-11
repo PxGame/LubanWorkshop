@@ -2,6 +2,7 @@
 using Luban.Plugin;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,6 +34,9 @@ namespace Luban.Core.Services.Plugins
         private IPlugin _plugin;
         private List<PluginCommandGroup> _pluginCmdGroups;
 
+        private JsonSerializerSettings _jsonSettings;
+        private JsonSerializer _jsonSerializer;
+
         public PluginController(string pluginFolder)
         {
             _folder = pluginFolder;
@@ -49,19 +53,25 @@ namespace Luban.Core.Services.Plugins
             var configJsonStr = File.ReadAllText(configPath);
             _config = JsonConvert.DeserializeObject<PluginConfig>(configJsonStr);
 
+            _jsonSettings = new JsonSerializerSettings()
+            {
+                ContractResolver = new DefaultContractResolver()
+            };
+            _jsonSerializer = JsonSerializer.Create(_jsonSettings);
+
             _pluginLoadContext = new PluginLoadContext(
                 _folder,
                 _config
             );
 
-            _pluginLoadContext.InitializeMainAssembly();
-            if (_pluginLoadContext.PluginEntryType == null) { throw null; }
+            var mainTypes = _pluginLoadContext.LoadMainTypes();
+            if (mainTypes.entryType == null) { throw null; }
 
             // cmd groups
-            _pluginCmdGroups = LoadPluginCmdGroups(_pluginLoadContext.PluginCommandTypes.ToList());
+            _pluginCmdGroups = LoadPluginCmdGroups(mainTypes.cmdTypes);
 
             // plugin
-            _plugin = Container.Resolve(_pluginLoadContext.PluginEntryType, [], [],
+            _plugin = Container.Resolve(mainTypes.entryType, [], [],
                 new InjectExtraPropertyValue() {
                     { "RootFolder", _folder},
                     { "Config", _config},
@@ -73,9 +83,10 @@ namespace Luban.Core.Services.Plugins
         private List<PluginCommandGroup> LoadPluginCmdGroups(List<Type> cmdGroupTypes)
         {
             var pluginCmdGroups = new List<PluginCommandGroup>();
-            foreach (var pCmdType in cmdGroupTypes)
+
+            for (int i = 0; i < cmdGroupTypes.Count; i++)
             {
-                //cmd group
+                var pCmdType = cmdGroupTypes[i];
                 var pCmdGroup = LoadPluginCmdGroup(pCmdType);
                 if (pCmdGroup == null) { continue; }
 
@@ -99,8 +110,10 @@ namespace Luban.Core.Services.Plugins
 
             //cmds
             var methods = pCmdType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            foreach (var method in methods)
+
+            for (var i = 0; i < methods.Length; i++)
             {
+                var method = methods[i];
                 PluginCommand pCmd = LoadPluginCmd(method);
                 if (pCmd == null) { continue; }
                 pCmdGroup.Commands.Add(pCmd);
@@ -145,8 +158,9 @@ namespace Luban.Core.Services.Plugins
         private static List<PluginCommandArg> LoadPluginCmdArgs(ParameterInfo[] args)
         {
             var pCmdArgs = new List<PluginCommandArg>();
-            foreach (var arg in args)
+            for (int i = 0; i < args.Length; i++)
             {
+                var arg = args[i];
                 //arg
                 var pCmdArgAttr = arg.GetCustomAttribute<PCmdArgAttribute>();
                 var pCmdArg = new PluginCommandArg()
@@ -175,14 +189,14 @@ namespace Luban.Core.Services.Plugins
             {
                 foreach (var kv in args)
                 {
-                    jsonArgs[kv.Key] = kv.Value == null ? null : JToken.FromObject(kv.Value);
+                    jsonArgs[kv.Key] = kv.Value == null ? null : JToken.FromObject(kv.Value, _jsonSerializer);
                 }
             }
 
-            var resultJson = await cmd.InvokeAsync(cmdGroup.Target, jsonArgs);
+            var resultJson = await cmd.InvokeAsync(cmdGroup.Target, jsonArgs, _jsonSerializer);
             if (resultJson == null) { return default(T); }
 
-            return resultJson.ToObject<T>();
+            return resultJson.ToObject<T>(_jsonSerializer);
         }
 
         public async Task Load()
@@ -195,6 +209,10 @@ namespace Luban.Core.Services.Plugins
             await _plugin.OnUnload();
             _plugin = null;
             _pluginCmdGroups = null;
+
+            _jsonSettings.ContractResolver = null;
+            _jsonSettings = null;
+            _jsonSerializer = null;
 
             var contextWeak = new WeakReference(_pluginLoadContext);
             _pluginLoadContext.Unload();

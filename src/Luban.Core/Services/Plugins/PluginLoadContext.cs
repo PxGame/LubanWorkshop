@@ -13,26 +13,17 @@ namespace Luban.Core.Services.Plugins
 {
     internal class PluginLoadContext : AssemblyLoadContext
     {
-        private readonly AssemblyLoadContext _defaultLoadContext;
-
-        //private readonly string _appFolder;
         private readonly string _pluginFolder;
 
         private readonly PluginConfig _pluginConfig;
         private readonly string _mainAssemblyPath;
         private readonly AssemblyDependencyResolver _dependencyResolver;
 
-        private Assembly _mainAssembly;
-        public Type PluginEntryType { get; private set; }
-        public HashSet<Type> PluginCommandTypes { get; private set; } = new HashSet<Type>();
-
         public PluginLoadContext(
             string pluginFolder,
             PluginConfig pluginConfig
             ) : base(pluginConfig.Name, true)
         {
-            _defaultLoadContext = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly()) ?? AssemblyLoadContext.Default;
-
             _pluginFolder = pluginFolder;
             _pluginConfig = pluginConfig;
 
@@ -40,33 +31,38 @@ namespace Luban.Core.Services.Plugins
             _dependencyResolver = new AssemblyDependencyResolver(_mainAssemblyPath);
         }
 
-        public void InitializeMainAssembly()
+        public (Type entryType, List<Type> cmdTypes) LoadMainTypes()
         {
-            if (_mainAssembly == null) { _mainAssembly = LoadAssemblyFromFilePath(_mainAssemblyPath); }
+            var mainAssembly = LoadAssemblyFromFilePath(_mainAssemblyPath);
 
-            var types = _mainAssembly.GetTypes();
+            Type pluginEntryType = null;
+            List<Type> pluginCommandTypes = new List<Type>();
 
-            foreach (var type in types)
+            var types = mainAssembly.GetTypes();
+
+            for (int i = 0; i < types.Length; i++)
             {
-                if (!type.IsClass) { continue; }
+                var type = types[i];
                 if (typeof(IPluginEntry).IsAssignableFrom(type))
                 {
-                    PluginEntryType = type;
+                    pluginEntryType = type;
                 }
                 if (type.GetCustomAttribute<PCmdGroupAttribute>() != null)
                 {
-                    PluginCommandTypes.Add(type);
+                    pluginCommandTypes.Add(type);
                 }
             }
+
+            return (pluginEntryType, pluginCommandTypes);
         }
 
         protected override Assembly Load(AssemblyName assemblyName)
         {
-            if (_defaultLoadContext != null)
+            if (AssemblyLoadContext.Default != null)
             {
                 try
                 {
-                    var defaultAssembly = _defaultLoadContext.LoadFromAssemblyName(assemblyName);
+                    var defaultAssembly = AssemblyLoadContext.Default.LoadFromAssemblyName(assemblyName);
                     if (defaultAssembly != null)
                     {
                         return defaultAssembly;

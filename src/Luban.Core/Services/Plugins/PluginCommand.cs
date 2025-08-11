@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -90,7 +91,7 @@ namespace Luban.Core.Services.Plugins
             return builder.ToString();
         }
 
-        internal async Task<JToken> InvokeAsync(object target, Dictionary<string, JToken> name2value)
+        internal async Task<JToken> InvokeAsync(object target, Dictionary<string, JToken> name2value, JsonSerializer jsonSerializer)
         {
             if (Method == null) { throw new InvalidOperationException("Method is not set."); }
 
@@ -121,7 +122,7 @@ namespace Luban.Core.Services.Plugins
                 {
                     var taskResult = Ret.Type.GetProperty("Result").GetValue(task);
                     if (taskResult == null) { return null; }
-                    return JToken.FromObject(taskResult);
+                    return JToken.FromObject(taskResult, jsonSerializer);
                 }
                 else
                 {
@@ -131,7 +132,7 @@ namespace Luban.Core.Services.Plugins
             else
             {
                 if (result == null) { return null; }
-                return JToken.FromObject(result);
+                return JToken.FromObject(result, jsonSerializer);
             }
         }
     }
