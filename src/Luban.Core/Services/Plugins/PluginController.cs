@@ -6,11 +6,7 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Reflection;
-using System.Reflection.PortableExecutable;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Luban.Core.Services.Plugins
@@ -216,7 +212,6 @@ namespace Luban.Core.Services.Plugins
             _plugin = null;
             _pluginCmdGroups = null;
 
-            _jsonSettings.ContractResolver = null;
             _jsonSettings = null;
             _jsonSerializer = null;
 
