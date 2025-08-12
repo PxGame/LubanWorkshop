@@ -33,10 +33,10 @@ namespace Luban.Core.Services.Plugins
 
         public (Type entryType, List<Type> cmdTypes) LoadMainTypes()
         {
-            var mainAssembly = LoadAssemblyFromFilePath(_mainAssemblyPath);
-
             Type pluginEntryType = null;
             List<Type> pluginCommandTypes = new List<Type>();
+
+            var mainAssembly = LoadAssemblyFromFilePath(_mainAssemblyPath);
 
             var types = mainAssembly.GetTypes();
 
@@ -52,7 +52,6 @@ namespace Luban.Core.Services.Plugins
                     pluginCommandTypes.Add(type);
                 }
             }
-
             return (pluginEntryType, pluginCommandTypes);
         }
 

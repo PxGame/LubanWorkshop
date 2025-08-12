@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -102,7 +103,7 @@ namespace Luban.Core.Services.Plugins
                 var arg = Args[i];
                 if (name2value.TryGetValue(arg.Name, out var value))
                 {
-                    argObjs[i] = value == null ? null : value.ToObject(arg.Type);
+                    argObjs[i] = value == null ? null : value.ToObject(arg.Type, jsonSerializer);
                 }
                 else
                 {
@@ -117,7 +118,6 @@ namespace Luban.Core.Services.Plugins
                 var task = result as Task;
                 if (task == null) { throw new InvalidOperationException("Method does not return a Task or Task<T>."); }
                 await task;
-
                 if (Ret.Type.IsGenericType && Ret.Type.GetGenericTypeDefinition() == typeof(Task<>))
                 {
                     var taskResult = Ret.Type.GetProperty("Result").GetValue(task);

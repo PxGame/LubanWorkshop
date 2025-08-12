@@ -64,18 +64,21 @@ namespace Luban.Core.Services.Plugins
                 _config
             );
 
-            var mainTypes = _pluginLoadContext.LoadMainTypes();
-            if (mainTypes.entryType == null) { throw null; }
+            using (_pluginLoadContext.EnterContextualReflection())
+            {
+                var mainTypes = _pluginLoadContext.LoadMainTypes();
+                if (mainTypes.entryType == null) { throw null; }
 
-            // cmd groups
-            _pluginCmdGroups = LoadPluginCmdGroups(mainTypes.cmdTypes);
+                // cmd groups
+                _pluginCmdGroups = LoadPluginCmdGroups(mainTypes.cmdTypes);
 
-            // plugin
-            _plugin = Container.Resolve(mainTypes.entryType, [], [],
-                new InjectExtraPropertyValue() {
+                // plugin
+                _plugin = Container.Resolve(mainTypes.entryType, [], [],
+                    new InjectExtraPropertyValue() {
                     { "RootFolder", _folder},
                     { "Config", _config},
-                }) as IPlugin;
+                    }) as IPlugin;
+            }
 
             await Task.CompletedTask;
         }
@@ -178,25 +181,28 @@ namespace Luban.Core.Services.Plugins
 
         public async Task<T> InvokeCmdAsync<T>(string groupName, string cmdName, Dictionary<string, object> args)
         {
-            var cmdGroup = _pluginCmdGroups.Find(t => t.Name == groupName);
-            if (cmdGroup == null) { throw new Exception(); }
-
-            var cmd = cmdGroup.Commands.Find(t => t.Name == cmdName);
-            if (cmd == null) { throw new Exception(); }
-
-            Dictionary<string, JToken> jsonArgs = new Dictionary<string, JToken>();
-            if (args != null)
+            using (_pluginLoadContext.EnterContextualReflection())
             {
-                foreach (var kv in args)
+                JToken resultJson = null;
+                var cmdGroup = _pluginCmdGroups.Find(t => t.Name == groupName);
+                if (cmdGroup == null) { throw new Exception(); }
+
+                var cmd = cmdGroup.Commands.Find(t => t.Name == cmdName);
+                if (cmd == null) { throw new Exception(); }
+
+                Dictionary<string, JToken> jsonArgs = new Dictionary<string, JToken>();
+                if (args != null)
                 {
-                    jsonArgs[kv.Key] = kv.Value == null ? null : JToken.FromObject(kv.Value, _jsonSerializer);
+                    foreach (var kv in args)
+                    {
+                        jsonArgs[kv.Key] = kv.Value == null ? null : JToken.FromObject(kv.Value, _jsonSerializer);
+                    }
                 }
+
+                resultJson = await cmd.InvokeAsync(cmdGroup.Target, jsonArgs, _jsonSerializer);
+                if (resultJson == null) { return default(T); }
+                return resultJson.ToObject<T>(_jsonSerializer);
             }
-
-            var resultJson = await cmd.InvokeAsync(cmdGroup.Target, jsonArgs, _jsonSerializer);
-            if (resultJson == null) { return default(T); }
-
-            return resultJson.ToObject<T>(_jsonSerializer);
         }
 
         public async Task Load()
